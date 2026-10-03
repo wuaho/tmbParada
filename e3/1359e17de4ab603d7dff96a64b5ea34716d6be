@@ -1,0 +1,19 @@
+app/src/main/java/com/example/tmbparada/widget/TmbWidget.kt
+  s_6ffc69e2eb3ee8::t_f9eaa742aa2637 1-169
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "e31359e17de4ab603d7dff96a64b5ea34716d6be",
+  "prompts": {},
+  "sessions": {
+    "s_6ffc69e2eb3ee8": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_efce7a1d5ffeaNMbDopxPHvwj6",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "wuaho <juanjoserequenalama@gmail.com>"
+    }
+  }
+}
