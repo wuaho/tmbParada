@@ -1,0 +1,4 @@
+# Copy these values to local.properties. Do not commit real credentials.
+TMB_APP_ID=your_tmb_app_id
+TMB_APP_KEY=your_tmb_app_key
+TMB_STOP_ID=1001

@@ -1,0 +1,15 @@
+# Local Android/Gradle configuration
+local.properties
+.gradle/
+build/
+*/build/
+
+# IDE files
+.idea/
+*.iml
+.DS_Store
+
+# Generated local metadata
+captures/
+.externalNativeBuild/
+.cxx/

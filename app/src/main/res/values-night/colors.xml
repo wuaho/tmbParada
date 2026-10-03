@@ -1,0 +1,9 @@
+<resources>
+    <color name="widget_loading_background">#121318</color>
+    <color name="widget_loading_text">#E4E1E9</color>
+    <color name="widget_background">#121318</color>
+    <color name="widget_primary_text">#E4E1E9</color>
+    <color name="widget_secondary_text">#C5C6D0</color>
+    <color name="widget_accent">#A9C7FF</color>
+    <color name="widget_action_text">#10233F</color>
+</resources>

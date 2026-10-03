@@ -1,0 +1,9 @@
+<resources>
+    <style name="Theme.TmbParada" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">#A9C7FF</item>
+        <item name="android:navigationBarColor">#121318</item>
+        <item name="android:statusBarColor">#121318</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>
