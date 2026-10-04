@@ -1,0 +1,31 @@
+app/src/main/java/com/example/tmbparada/data/TmbTransitCatalog.kt
+  s_512cbeaf8835de::t_76c979895a78ed 55-59
+  s_512cbeaf8835de::t_2940f8eb89ccaf 1-54,60-72
+app/src/main/java/com/example/tmbparada/data/TmbApiClient.kt
+  s_512cbeaf8835de::t_2940f8eb89ccaf 33-64
+app/src/test/java/com/example/tmbparada/data/TmbTransitCatalogParserTest.kt
+  s_512cbeaf8835de::t_2940f8eb89ccaf 1,3,6,8-15,19-26
+README.md
+  s_512cbeaf8835de::t_46ec042c3edab0 43-53
+  s_512cbeaf8835de::t_76c979895a78ed 65-66,69
+app/src/main/java/com/example/tmbparada/widget/TmbWidgetConfigurationActivity.kt
+  s_512cbeaf8835de::t_2940f8eb89ccaf 9,12,16-17,20,36-39,41,43,64,68,72,91,94-95,99-101,103-106,108-123,125-131,139,142-150,153-159,161-162,164,166,168-203,208-218
+  s_512cbeaf8835de::t_76c979895a78ed 26,28-29,96-98,102,107,124,132-134,219
+  s_512cbeaf8835de::t_ec5d9cf7ba6b55 220
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "bc68ac6474942eb1714e8b2b50dbccf312c10315",
+  "prompts": {},
+  "sessions": {
+    "s_512cbeaf8835de": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_efcb11c9fffeU0COg21670Udxv",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "wuaho <juanjoserequenalama@gmail.com>"
+    }
+  }
+}
