@@ -14,6 +14,7 @@ import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import kotlinx.coroutines.flow.Flow
+import java.text.Normalizer
 
 @Entity(tableName = "bus_lines")
 data class BusLineEntity(
@@ -139,14 +140,19 @@ class TmbTransitSearchRepository(context: Context) {
         dao.searchStops(query.toFtsPrefixQuery())
 }
 
+internal fun normalizeForSearch(value: String): String =
+    Normalizer.normalize(value, Normalizer.Form.NFD)
+        .replace(ACCENT_MARKS_REGEX, "")
+
 private fun String.toFtsPrefixQuery(): String =
     trim()
         .split(WHITESPACE_REGEX)
         .filter(String::isNotBlank)
         .joinToString(" ") { token ->
-            token.filter { it.isLetterOrDigit() }.lowercase() + "*"
+            normalizeForSearch(token).filter { it.isLetterOrDigit() }.lowercase() + "*"
         }
         .ifBlank { NO_MATCH_QUERY }
 
+private val ACCENT_MARKS_REGEX = Regex("\\p{Mn}+")
 private val WHITESPACE_REGEX = Regex("\\s+")
 private const val NO_MATCH_QUERY = "__no_match__*"
