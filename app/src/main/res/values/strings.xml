@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">TMB Parada</string>
-    <string name="widget_description">Minutos restantes para tu parada de bus TMB</string>
+    <string name="app_name">TMB Stop</string>
+    <string name="widget_description">Remaining minutes for a TMB bus stop</string>
 </resources>

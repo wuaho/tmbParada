@@ -6,7 +6,7 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_bus"
-        android:label="TMB Parada"
+        android:label="TMB Stop"
         android:supportsRtl="true"
         android:theme="@style/Theme.TmbParada">
         <activity
@@ -21,7 +21,7 @@
         <receiver
             android:name=".widget.TmbWidgetReceiver"
             android:exported="true"
-            android:label="TMB Parada">
+            android:label="TMB Stop">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

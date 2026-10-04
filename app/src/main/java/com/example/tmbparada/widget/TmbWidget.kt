@@ -57,9 +57,9 @@ private fun TmbWidgetContent(state: WidgetState) {
     val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
     val updatedAt = state.lastUpdatedEpochMillis?.let { dateFormat.format(Date(it)) }
     val status = when {
-        state.isLive(now) -> "En directo..."
-        updatedAt != null -> "Actualizado a las $updatedAt"
-        else -> "Sin actualizar"
+        state.isLive(now) -> "Live..."
+        updatedAt != null -> "Updated at $updatedAt"
+        else -> "Not updated"
     }
 
     Column(
@@ -75,7 +75,7 @@ private fun TmbWidgetContent(state: WidgetState) {
         ) {
             Column(modifier = GlanceModifier.defaultWeight()) {
                 Text(
-                    text = "TMB / PARADA",
+                    text = "TMB / STOP",
                     style = TextStyle(
                         color = secondaryText,
                         fontSize = 10.sp,
@@ -99,7 +99,7 @@ private fun TmbWidgetContent(state: WidgetState) {
                 verticalAlignment = Alignment.Vertical.CenterVertically,
             ) {
                 Text(
-                    text = "RECARGAR",
+                    text = "REFRESH",
                     style = TextStyle(
                         color = actionText,
                         fontSize = 10.sp,
@@ -113,8 +113,8 @@ private fun TmbWidgetContent(state: WidgetState) {
 
         if (state.arrivals.isEmpty()) {
             Text(
-                text = state.lines.takeIf { it.isNotEmpty() }?.let { "Líneas: ${it.joinToString()}" }
-                    ?: "Pulsa RECARGAR para consultar los buses",
+                text = state.lines.takeIf { it.isNotEmpty() }?.let { "Lines: ${it.joinToString()}" }
+                    ?: "Press REFRESH to query buses",
                 style = TextStyle(color = secondaryText, fontSize = 12.sp),
             )
         } else {

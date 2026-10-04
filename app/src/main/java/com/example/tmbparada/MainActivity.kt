@@ -36,16 +36,16 @@ private fun SetupScreen() {
         modifier = Modifier.fillMaxSize().padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("TMB Parada", style = MaterialTheme.typography.headlineMedium)
+        Text("TMB Stop", style = MaterialTheme.typography.headlineMedium)
         Text(
-            "Widget configurado para la parada ${TmbConfig.defaultStopId}.",
+            "Widget configured for stop ${TmbConfig.defaultStopId}.",
             style = MaterialTheme.typography.bodyLarge,
         )
         Text(
             if (credentialsConfigured) {
-                "API de TMB configurada. Añade el widget a la pantalla de inicio."
+                "TMB API configured. Add the widget to your home screen."
             } else {
-                "Faltan TMB_APP_ID y TMB_APP_KEY en local.properties. Consulta README.md."
+                "TMB_APP_ID and TMB_APP_KEY are missing from local.properties. See README.md."
             },
             style = MaterialTheme.typography.bodyMedium,
         )

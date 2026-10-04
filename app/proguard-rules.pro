@@ -1,1 +1,1 @@
-# TMB Parada does not need custom R8 rules.
+# TMB Stop does not need custom R8 rules.

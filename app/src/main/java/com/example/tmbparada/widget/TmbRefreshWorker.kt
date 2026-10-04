@@ -40,7 +40,7 @@ class TmbRefreshWorker(
             }
             .onFailure { error ->
                 repository.save(
-                    state.copy(errorMessage = error.message ?: "No se pudo consultar TMB"),
+                    state.copy(errorMessage = error.message ?: "Could not query TMB"),
                 )
             }
 
