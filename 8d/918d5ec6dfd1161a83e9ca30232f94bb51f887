@@ -1,0 +1,42 @@
+app/build.gradle.kts
+  s_512cbeaf8835de::t_4bc61bf4ffe5cc 75
+app/src/main/java/com/example/tmbparada/data/WidgetState.kt
+  s_512cbeaf8835de::t_4bc61bf4ffe5cc 28-29,34,36,40-41,44-48,53-54
+README.md
+  s_512cbeaf8835de::t_4bc61bf4ffe5cc 53-55
+  s_512cbeaf8835de::t_358c2f972c1605 57-58
+  s_512cbeaf8835de::t_eca638f1372058 56
+app/src/test/java/com/example/tmbparada/widget/TmbWidgetConfigurationActivityTest.kt
+  s_512cbeaf8835de::t_358c2f972c1605 1-19
+app/src/main/java/com/example/tmbparada/widget/TmbRefreshScheduler.kt
+  s_512cbeaf8835de::t_4bc61bf4ffe5cc 13-14,16,18,20-22,24,30,35,38,44-47,50-51
+  s_512cbeaf8835de::t_9689187527b826 7
+app/src/main/res/xml/tmb_widget_info.xml
+  s_512cbeaf8835de::t_4bc61bf4ffe5cc 4
+app/src/main/java/com/example/tmbparada/widget/TmbWidgetConfigurationActivity.kt
+  s_512cbeaf8835de::t_4bc61bf4ffe5cc 1-33,35-37,39-50,52-61,63,65,67-86,90-95,97-125
+  s_512cbeaf8835de::t_358c2f972c1605 34,38,51,62,64,66,87-89,96
+app/src/main/java/com/example/tmbparada/widget/TmbRefreshWorker.kt
+  s_512cbeaf8835de::t_4bc61bf4ffe5cc 4,19-22,27-28,35,45,52,55,59-60,64-66
+  s_512cbeaf8835de::t_e70f2513391a76 67
+app/src/main/java/com/example/tmbparada/widget/TmbWidget.kt
+  s_512cbeaf8835de::t_4bc61bf4ffe5cc 8,39-47,52,54,176-177
+app/src/main/AndroidManifest.xml
+  s_512cbeaf8835de::t_4bc61bf4ffe5cc 20-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "8d918d5ec6dfd1161a83e9ca30232f94bb51f887",
+  "prompts": {},
+  "sessions": {
+    "s_512cbeaf8835de": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_efcb11c9fffeU0COg21670Udxv",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "wuaho <juanjoserequenalama@gmail.com>"
+    }
+  }
+}
