@@ -1,0 +1,21 @@
+app/src/main/java/com/example/tmbparada/data/TmbTransitDatabase.kt
+  s_512cbeaf8835de::t_06d12c7267cb5b 17,143-146,152,156
+app/src/test/java/com/example/tmbparada/data/TmbTransitSearchTest.kt
+  s_512cbeaf8835de::t_06d12c7267cb5b 1-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "c81665c1aad8f348c97ad02399f67bc577f00b64",
+  "prompts": {},
+  "sessions": {
+    "s_512cbeaf8835de": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_efcb11c9fffeU0COg21670Udxv",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "wuaho <juanjoserequenalama@gmail.com>"
+    }
+  }
+}
