@@ -1,0 +1,35 @@
+README.md
+  s_512cbeaf8835de::t_a0a2182004128c 47-49,62-63
+  s_512cbeaf8835de::t_a9e168db7f62d7 43-46
+app/build.gradle.kts
+  s_512cbeaf8835de::t_05b84f6f80ae21 71-74
+  s_512cbeaf8835de::t_7f10385b52f1f1 76-77
+  s_512cbeaf8835de::t_c8b8f425e27b8f 6,75,96
+  s_512cbeaf8835de::t_9cf5ae861b0607 89-90
+  s_512cbeaf8835de::t_57cc8b4b39bcf0 97
+app/src/main/java/com/example/tmbparada/data/TmbTransitDatabase.kt
+  s_512cbeaf8835de::t_9cf5ae861b0607 3-26,29-37,40-126,128-130,132-133,135-136,138-140,142-149,151-152
+build.gradle.kts
+  s_512cbeaf8835de::t_c8b8f425e27b8f 3
+.gitignore
+  s_512cbeaf8835de::t_be87c6d57ba33e 14-18
+app/src/main/java/com/example/tmbparada/widget/TmbWidgetConfigurationActivity.kt
+  s_512cbeaf8835de::t_347c8dae8f741a 23,33,35,61,65-66,70,86,88,92-96,105,107,114,117-123,126-127,136,142-146
+  s_512cbeaf8835de::t_05b84f6f80ae21 30,89-90
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "62667f3883ce65f442c580c0fd967a96966e20e9",
+  "prompts": {},
+  "sessions": {
+    "s_512cbeaf8835de": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_efcb11c9fffeU0COg21670Udxv",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "wuaho <juanjoserequenalama@gmail.com>"
+    }
+  }
+}
