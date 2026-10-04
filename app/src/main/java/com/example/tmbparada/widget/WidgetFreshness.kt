@@ -1,6 +1,8 @@
 package com.example.tmbparada.widget
 
 object WidgetFreshness {
+    const val STALE_AFTER_MILLIS = 5 * 60_000L
+
     fun relativeLabel(lastUpdatedEpochMillis: Long?, nowMillis: Long): String {
         if (lastUpdatedEpochMillis == null) return "No data yet"
 
@@ -12,6 +14,11 @@ object WidgetFreshness {
             else -> "Updated ${minutes / 60L}h ago"
         }
     }
+
+    fun isStale(lastUpdatedEpochMillis: Long?, nowMillis: Long): Boolean =
+        lastUpdatedEpochMillis?.let {
+            nowMillis - it >= STALE_AFTER_MILLIS
+        } == true
 
     private const val MILLIS_PER_MINUTE = 60_000L
 }

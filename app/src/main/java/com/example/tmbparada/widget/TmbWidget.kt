@@ -67,6 +67,7 @@ private val accent = ColorProvider(R.color.widget_accent)
 private val actionText = ColorProvider(R.color.widget_action_text)
 private val successStatus = ColorProvider(R.color.widget_success_status)
 private val errorStatus = ColorProvider(R.color.widget_error_status)
+private val warningStatus = ColorProvider(R.color.widget_warning_status)
 
 private val lineBadgeColors = listOf(
     Color(0xFF2667A8),
@@ -80,15 +81,22 @@ private val lineBadgeColors = listOf(
 @androidx.compose.runtime.Composable
 private fun TmbWidgetContent(state: WidgetState) {
     val now = System.currentTimeMillis()
+    val isStale = WidgetFreshness.isStale(state.lastUpdatedEpochMillis, now)
     val statusText = when {
         state.isRefreshing -> "Updating..."
-        state.errorMessage != null -> "Update failed"
+        state.errorMessage != null -> "Update failed - tap refresh to retry"
         else -> WidgetFreshness.relativeLabel(state.lastUpdatedEpochMillis, now)
     }
     val statusColor = when {
         state.isRefreshing -> accent
         state.errorMessage != null -> errorStatus
+        isStale -> warningStatus
         state.lastUpdatedEpochMillis != null -> successStatus
+        else -> secondaryText
+    }
+    val refreshBorderColor = when {
+        state.errorMessage != null -> errorStatus
+        isStale -> warningStatus
         else -> secondaryText
     }
 
@@ -121,7 +129,10 @@ private fun TmbWidgetContent(state: WidgetState) {
                     ),
                 )
             }
-            RefreshButton()
+            RefreshButton(
+                isRefreshing = state.isRefreshing,
+                borderColor = refreshBorderColor,
+            )
         }
 
         if (state.isRefreshing) {
@@ -139,7 +150,12 @@ private fun TmbWidgetContent(state: WidgetState) {
             Spacer(modifier = GlanceModifier.height(10.dp))
             if (state.arrivals.isEmpty()) {
                 Text(
-                    text = "No upcoming buses",
+                    text = when {
+                        state.isRefreshing -> "Fetching live arrivals..."
+                        state.errorMessage != null -> "Could not update arrivals"
+                        state.lastUpdatedEpochMillis != null -> "No buses due right now"
+                        else -> "Tap refresh to load arrivals"
+                    },
                     style = TextStyle(color = secondaryText, fontSize = 12.sp),
                 )
             } else {
@@ -169,23 +185,38 @@ private fun TmbWidgetContent(state: WidgetState) {
 }
 
 @androidx.compose.runtime.Composable
-private fun RefreshButton() {
+private fun RefreshButton(
+    isRefreshing: Boolean,
+    borderColor: ColorProvider,
+) {
     Box(
         modifier = GlanceModifier
             .size(48.dp)
-            .background(accent)
+            .background(borderColor)
             .cornerRadius(24.dp)
             .clickable(actionRunCallback<RefreshActionCallback>()),
         contentAlignment = Alignment.Center,
     ) {
-        Text(
-            text = "↻",
-            style = TextStyle(
-                color = actionText,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-            ),
-        )
+        Box(
+            modifier = GlanceModifier
+                .size(44.dp)
+                .background(widgetBackground)
+                .cornerRadius(22.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (isRefreshing) {
+                CircularProgressIndicator(color = accent)
+            } else {
+                Text(
+                    text = "↻",
+                    style = TextStyle(
+                        color = borderColor,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                    ),
+                )
+            }
+        }
     }
 }
 
