@@ -1,0 +1,28 @@
+.gitignore
+  s_512cbeaf8835de::t_75a7959a20e065 4
+  s_512cbeaf8835de::t_76a3f977bd38fc 5
+app/src/main/java/com/example/tmbparada/data/WidgetState.kt
+  s_512cbeaf8835de::t_4ea4f7729ea75d 5
+app/src/main/java/com/example/tmbparada/widget/TmbRefreshWorker.kt
+  s_512cbeaf8835de::t_76a3f977bd38fc 8
+app/src/main/java/com/example/tmbparada/widget/TmbWidget.kt
+  s_512cbeaf8835de::t_76a3f977bd38fc 26-27
+app/src/main/java/com/example/tmbparada/data/TmbResponseParser.kt
+  s_512cbeaf8835de::t_76a3f977bd38fc 47-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "3ce6c89b55dd33a434e4ffb308dd8a4f9dde3575",
+  "prompts": {},
+  "sessions": {
+    "s_512cbeaf8835de": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_efcb11c9fffeU0COg21670Udxv",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "wuaho <juanjoserequenalama@gmail.com>"
+    }
+  }
+}
