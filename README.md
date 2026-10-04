@@ -40,16 +40,13 @@ The application uses this request:
 GET https://api.tmb.cat/v1/ibus/stops/{stop_id}?app_id={app_id}&app_key={app_key}
 ```
 
-The widget setup screen uses the TMB transit catalog to find stops:
-
-```text
-GET https://api.tmb.cat/v1/transit/linies/bus/
-GET https://api.tmb.cat/v1/transit/linies/bus/{line_id}/parades/
-```
-
-The first request loads bus lines. After the user selects a line, the second
-request loads its stop names, directions, and numeric IDs. Search is then
-performed locally in the configuration screen.
+Stop discovery is now local and offline: the app ships with
+`app/src/main/assets/tmb_transit.db`, a Room-compatible SQLite database built
+from the TMB transit catalog. It contains `bus_lines`, `stops`, `line_stops`,
+and the FTS4 table `stops_fts`. The configuration screen searches stop codes,
+stop names, and line names locally. The database is copied by Room from the
+asset on first access. Network access is used only for live arrival requests
+after a stop has been selected.
 
 ## Build and Install
 
@@ -62,8 +59,8 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 Open the application to check the configuration, then add **TMB Stop** from
 the home-screen widget picker. Android opens a configuration screen where you
-search for a bus line, select it, and then search for one of its stops by name
-or ID. Each widget instance can use a different stop.
+search for a stop by name, stop code, or bus line. Each widget instance can use
+a different stop.
 
 To reconfigure an existing widget, remove it from the home screen and add a
 new instance with the desired stop.

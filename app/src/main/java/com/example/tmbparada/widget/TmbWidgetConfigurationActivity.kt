@@ -15,32 +15,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
 import androidx.glance.appwidget.AppWidgetId
 import androidx.lifecycle.lifecycleScope
-import com.example.tmbparada.data.BusLine
-import com.example.tmbparada.data.BusStop
-import com.example.tmbparada.data.TmbApiClient
+import com.example.tmbparada.data.StopSearchResult
 import com.example.tmbparada.data.TmbStateRepository
-import kotlinx.coroutines.Dispatchers
+import com.example.tmbparada.data.TmbTransitSearchRepository
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class TmbWidgetConfigurationActivity : ComponentActivity() {
     private var appWidgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID
@@ -65,15 +58,16 @@ class TmbWidgetConfigurationActivity : ComponentActivity() {
         }
     }
 
-    private fun saveConfiguration(stop: BusStop) {
+    private fun saveConfiguration(stop: StopSearchResult) {
         repository.save(
             appWidgetId,
             repository.read(appWidgetId).copy(
-                stopId = stop.id,
-                lines = emptyList(),
+                stopId = stop.stopCode.toString(),
+                lines = stop.lineNames.split(",").map(String::trim).filter(String::isNotBlank),
                 arrivals = emptyList(),
                 lastUpdatedEpochMillis = null,
                 activeUntilEpochMillis = null,
+                isRefreshing = false,
                 errorMessage = null,
             ),
         )
@@ -88,49 +82,19 @@ class TmbWidgetConfigurationActivity : ComponentActivity() {
     }
 }
 
-private enum class CatalogStep { LINES, STOPS }
-
 @androidx.compose.runtime.Composable
-private fun TmbWidgetConfigurationScreen(onSave: (BusStop) -> Unit) {
-    var step by rememberSaveable { mutableStateOf(CatalogStep.LINES) }
-    var lines by remember { mutableStateOf<List<BusLine>>(emptyList()) }
-    var stops by remember { mutableStateOf<List<BusStop>>(emptyList()) }
-    var selectedLine by remember { mutableStateOf<BusLine?>(null) }
+private fun TmbWidgetConfigurationScreen(onSave: (StopSearchResult) -> Unit) {
     var query by rememberSaveable { mutableStateOf("") }
-    var loading by rememberSaveable { mutableStateOf(false) }
-    var error by rememberSaveable { mutableStateOf<String?>(null) }
-    val scope = rememberCoroutineScope()
+    var results by remember { mutableStateOf<List<StopSearchResult>>(emptyList()) }
+    val context = LocalContext.current
+    val searchRepository = remember(context) { TmbTransitSearchRepository(context) }
 
-    fun loadLines() {
-        loading = true
-        error = null
-        scope.launch {
-            runCatching { withContext(Dispatchers.IO) { TmbApiClient().fetchBusLines() } }
-                .onSuccess {
-                    lines = it
-                    query = ""
-                }
-                .onFailure { error = it.message ?: "Could not load bus lines" }
-            loading = false
+    LaunchedEffect(query) {
+        if (query.isBlank()) {
+            results = emptyList()
+        } else {
+            searchRepository.search(query).collect { results = it }
         }
-    }
-
-    fun loadStops(line: BusLine) {
-        selectedLine = line
-        step = CatalogStep.STOPS
-        query = ""
-        loading = true
-        error = null
-        scope.launch {
-            runCatching { withContext(Dispatchers.IO) { TmbApiClient().fetchBusStops(line.id) } }
-                .onSuccess { stops = it }
-                .onFailure { error = it.message ?: "Could not load stops" }
-            loading = false
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        loadLines()
     }
 
     Surface(modifier = Modifier.fillMaxSize()) {
@@ -138,67 +102,29 @@ private fun TmbWidgetConfigurationScreen(onSave: (BusStop) -> Unit) {
             modifier = Modifier.fillMaxSize().padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            Text("Choose a bus stop", style = MaterialTheme.typography.headlineMedium)
             Text(
-                if (step == CatalogStep.LINES) "Choose a bus line" else "Choose a bus stop",
-                style = MaterialTheme.typography.headlineMedium,
-            )
-            Text(
-                if (step == CatalogStep.LINES) {
-                    "Search for a line first, then choose one of its stops."
-                } else {
-                    "${selectedLine?.name.orEmpty()} - ${selectedLine?.description.orEmpty()}"
-                },
+                "Search by stop name, stop code, or bus line.",
                 style = MaterialTheme.typography.bodyLarge,
             )
-            if (step == CatalogStep.STOPS) {
-                Text(
-                    text = "Back to lines",
-                    modifier = Modifier.clickable { step = CatalogStep.LINES },
-                    color = MaterialTheme.colorScheme.primary,
-                )
-            }
             OutlinedTextField(
                 value = query,
                 onValueChange = { query = it },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text(if (step == CatalogStep.LINES) "Search lines" else "Search stops") },
+                label = { Text("Search stops") },
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             )
-            if (loading) {
-                CircularProgressIndicator()
-            } else if (error != null) {
-                Text(error.orEmpty(), color = MaterialTheme.colorScheme.error)
-                Button(onClick = { if (step == CatalogStep.LINES) loadLines() else selectedLine?.let(::loadStops) }) {
-                    Text("Retry")
-                }
-            } else if (step == CatalogStep.LINES) {
-                val filteredLines = lines.filter { line ->
-                    line.name.contains(query, ignoreCase = true) ||
-                        line.description.contains(query, ignoreCase = true) ||
-                        line.origin.contains(query, ignoreCase = true) ||
-                        line.destination.contains(query, ignoreCase = true)
-                }
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    items(filteredLines, key = BusLine::id) { line ->
-                        CatalogRow(
-                            title = line.name,
-                            subtitle = "${line.origin} -> ${line.destination}",
-                            onClick = { loadStops(line) },
-                        )
-                    }
-                }
+            if (query.isBlank()) {
+                Text(
+                    "Try: Selva de Mar, 2903, or V29",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            } else if (results.isEmpty()) {
+                Text("No stops found", style = MaterialTheme.typography.bodyMedium)
             } else {
-                val filteredStops = stops.filter { stop ->
-                    stop.name.contains(query, ignoreCase = true) || stop.id.contains(query)
-                }
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    items(filteredStops, key = { "${it.id}-${it.direction}" }) { stop ->
-                        CatalogRow(
-                            title = stop.name,
-                            subtitle = "Stop ${stop.id} - direction ${stop.direction}",
-                            onClick = { onSave(stop) },
-                        )
+                    items(results, key = { "${it.stopCode}-${it.stopName}" }) { stop ->
+                        StopSearchRow(stop, onClick = { onSave(stop) })
                     }
                 }
             }
@@ -207,14 +133,17 @@ private fun TmbWidgetConfigurationScreen(onSave: (BusStop) -> Unit) {
 }
 
 @androidx.compose.runtime.Composable
-private fun CatalogRow(title: String, subtitle: String, onClick: () -> Unit) {
+private fun StopSearchRow(stop: StopSearchResult, onClick: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 10.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Column {
-            Text(title, style = MaterialTheme.typography.bodyLarge)
-            Text(subtitle, style = MaterialTheme.typography.bodySmall)
+            Text(stop.stopName, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                "Stop ${stop.stopCode} · ${stop.lineNames}",
+                style = MaterialTheme.typography.bodySmall,
+            )
         }
     }
 }

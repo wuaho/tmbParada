@@ -11,6 +11,11 @@ build/
 *.iml
 .DS_Store
 
+# Eclipse/Buildship metadata
+.project
+.classpath
+.settings/
+
 # Generated local metadata
 captures/
 .externalNativeBuild/
