@@ -24,10 +24,13 @@ class TmbRefreshWorker(
         val now = System.currentTimeMillis()
 
         if (now >= activeUntil) {
-            repository.save(widgetId, state.copy(activeUntilEpochMillis = null))
+            repository.save(widgetId, state.copy(activeUntilEpochMillis = null, isRefreshing = false))
             TmbWidget().update(applicationContext, AppWidgetId(widgetId))
             return Result.success()
         }
+
+        repository.save(widgetId, state.copy(isRefreshing = true))
+        TmbWidget().update(applicationContext, AppWidgetId(widgetId))
 
         runCatching { client.fetchArrivals(state.stopId) }
             .onSuccess { response ->
@@ -37,13 +40,17 @@ class TmbRefreshWorker(
                         lines = lines,
                         arrivals = response.arrivals,
                         lastUpdatedEpochMillis = System.currentTimeMillis(),
+                        isRefreshing = false,
                         errorMessage = null,
                     ),
                 )
             }
             .onFailure { error ->
                 repository.save(widgetId,
-                    state.copy(errorMessage = error.message ?: "Could not query TMB"),
+                    state.copy(
+                        isRefreshing = false,
+                        errorMessage = error.message ?: "Could not query TMB",
+                    ),
                 )
             }
 
@@ -56,7 +63,10 @@ class TmbRefreshWorker(
                 minOf(TmbRefreshScheduler.intervalMillis(), remainingMillis),
             )
         } else {
-            repository.save(widgetId, repository.read(widgetId).copy(activeUntilEpochMillis = null))
+            repository.save(
+                widgetId,
+                repository.read(widgetId).copy(activeUntilEpochMillis = null, isRefreshing = false),
+            )
             TmbWidget().update(applicationContext, AppWidgetId(widgetId))
         }
         return Result.success()

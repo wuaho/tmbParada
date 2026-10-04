@@ -12,6 +12,7 @@ data class WidgetState(
     val arrivals: List<BusArrival> = emptyList(),
     val lastUpdatedEpochMillis: Long? = null,
     val activeUntilEpochMillis: Long? = null,
+    val isRefreshing: Boolean = false,
     val errorMessage: String? = null,
 ) {
     fun isLive(nowMillis: Long = System.currentTimeMillis()): Boolean =
@@ -40,6 +41,7 @@ class TmbStateRepository(context: Context) {
     fun beginLive(widgetId: Int, nowMillis: Long = System.currentTimeMillis()): WidgetState {
         return read(widgetId).copy(
             activeUntilEpochMillis = nowMillis + TmbConfig.LIVE_WINDOW_MILLIS,
+            isRefreshing = true,
             errorMessage = null,
         ).also { save(widgetId, it) }
     }

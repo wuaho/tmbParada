@@ -1,38 +1,42 @@
 package com.example.tmbparada.widget
 
 import android.content.Context
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.action.ActionParameters
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.AppWidgetId
+import androidx.glance.appwidget.CircularProgressIndicator
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
+import androidx.glance.appwidget.LinearProgressIndicator
 import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.action.actionRunCallback
+import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.layout.Alignment
+import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
+import androidx.glance.layout.height
 import androidx.glance.layout.padding
+import androidx.glance.layout.size
 import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import androidx.glance.layout.height
 import androidx.glance.unit.ColorProvider
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.tmbparada.R
 import com.example.tmbparada.data.BusArrival
 import com.example.tmbparada.data.TmbStateRepository
 import com.example.tmbparada.data.WidgetState
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class TmbWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = TmbWidget()
@@ -61,21 +65,36 @@ private val primaryText = ColorProvider(R.color.widget_primary_text)
 private val secondaryText = ColorProvider(R.color.widget_secondary_text)
 private val accent = ColorProvider(R.color.widget_accent)
 private val actionText = ColorProvider(R.color.widget_action_text)
+private val successStatus = ColorProvider(R.color.widget_success_status)
+private val errorStatus = ColorProvider(R.color.widget_error_status)
+
+private val lineBadgeColors = listOf(
+    Color(0xFF2667A8),
+    Color(0xFF2E7D32),
+    Color(0xFF8E24AA),
+    Color(0xFFC45100),
+    Color(0xFF00695C),
+    Color(0xFFAD1457),
+)
 
 @androidx.compose.runtime.Composable
 private fun TmbWidgetContent(state: WidgetState) {
     val now = System.currentTimeMillis()
-    val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-    val updatedAt = state.lastUpdatedEpochMillis?.let { dateFormat.format(Date(it)) }
-    val status = when {
-        state.isLive(now) -> "Live..."
-        updatedAt != null -> "Updated at $updatedAt"
-        else -> "Not updated"
+    val statusText = when {
+        state.isRefreshing -> "Updating..."
+        state.errorMessage != null -> "Update failed"
+        else -> WidgetFreshness.relativeLabel(state.lastUpdatedEpochMillis, now)
+    }
+    val statusColor = when {
+        state.isRefreshing -> accent
+        state.errorMessage != null -> errorStatus
+        state.lastUpdatedEpochMillis != null -> successStatus
+        else -> secondaryText
     }
 
     Column(
         modifier = GlanceModifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .background(widgetBackground)
             .padding(16.dp),
         verticalAlignment = Alignment.Vertical.Top,
@@ -102,42 +121,70 @@ private fun TmbWidgetContent(state: WidgetState) {
                     ),
                 )
             }
-            Row(
-                modifier = GlanceModifier
-                    .clickable(actionRunCallback<RefreshActionCallback>())
-                    .background(accent)
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.Vertical.CenterVertically,
-            ) {
-                Text(
-                    text = "REFRESH",
-                    style = TextStyle(
-                        color = actionText,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                    ),
-                )
-            }
+            RefreshButton()
         }
 
-        Spacer(modifier = GlanceModifier.height(8.dp))
-
-        if (state.arrivals.isEmpty()) {
-            Text(
-                text = state.lines.takeIf { it.isNotEmpty() }?.let { "Lines: ${it.joinToString()}" }
-                    ?: "Press REFRESH to query buses",
-                style = TextStyle(color = secondaryText, fontSize = 12.sp),
+        if (state.isRefreshing) {
+            Spacer(modifier = GlanceModifier.height(8.dp))
+            LinearProgressIndicator(
+                modifier = GlanceModifier.fillMaxWidth(),
+                color = accent,
             )
-        } else {
-            state.arrivals.take(MAX_ARRIVALS).forEach { arrival ->
-                ArrivalRow(arrival)
+        }
+
+        Column(
+            modifier = GlanceModifier.fillMaxWidth().defaultWeight(),
+            verticalAlignment = Alignment.Vertical.Top,
+        ) {
+            Spacer(modifier = GlanceModifier.height(10.dp))
+            if (state.arrivals.isEmpty()) {
+                Text(
+                    text = "No upcoming buses",
+                    style = TextStyle(color = secondaryText, fontSize = 12.sp),
+                )
+            } else {
+                state.arrivals.take(MAX_ARRIVALS).forEach { arrival ->
+                    ArrivalRow(arrival)
+                }
             }
         }
 
-        Spacer(modifier = GlanceModifier.height(4.dp))
+        Row(
+            modifier = GlanceModifier.fillMaxWidth().padding(top = 8.dp),
+            verticalAlignment = Alignment.Vertical.CenterVertically,
+        ) {
+            Box(
+                modifier = GlanceModifier
+                    .size(6.dp)
+                    .background(statusColor)
+                    .cornerRadius(3.dp),
+            ) {}
+            Spacer(modifier = GlanceModifier.width(6.dp))
+            Text(
+                text = statusText,
+                style = TextStyle(color = secondaryText, fontSize = 11.sp),
+            )
+        }
+    }
+}
+
+@androidx.compose.runtime.Composable
+private fun RefreshButton() {
+    Box(
+        modifier = GlanceModifier
+            .size(48.dp)
+            .background(accent)
+            .cornerRadius(24.dp)
+            .clickable(actionRunCallback<RefreshActionCallback>()),
+        contentAlignment = Alignment.Center,
+    ) {
         Text(
-            text = state.errorMessage?.let { "Error: $it" } ?: status,
-            style = TextStyle(color = if (state.errorMessage == null) secondaryText else accent, fontSize = 10.sp),
+            text = "↻",
+            style = TextStyle(
+                color = actionText,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+            ),
         )
     }
 }
@@ -145,25 +192,45 @@ private fun TmbWidgetContent(state: WidgetState) {
 @androidx.compose.runtime.Composable
 private fun ArrivalRow(arrival: BusArrival) {
     Row(
-        modifier = GlanceModifier.fillMaxWidth().padding(vertical = 2.dp),
+        modifier = GlanceModifier.fillMaxWidth().padding(vertical = 4.dp),
         verticalAlignment = Alignment.Vertical.CenterVertically,
     ) {
+        Box(
+            modifier = GlanceModifier
+                .width(48.dp)
+                .height(28.dp)
+                .background(lineBadgeColor(arrival.line))
+                .cornerRadius(8.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = arrival.line,
+                style = TextStyle(
+                    color = actionText,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                ),
+            )
+        }
+        Spacer(modifier = GlanceModifier.width(10.dp))
         Text(
-            text = arrival.line,
-            modifier = GlanceModifier.width(48.dp),
-            style = TextStyle(color = accent, fontSize = 15.sp, fontWeight = FontWeight.Bold),
+            text = arrival.destination ?: "Upcoming arrival",
+            modifier = GlanceModifier.defaultWeight(),
+            style = TextStyle(color = primaryText, fontSize = 13.sp),
         )
         Text(
-            text = "->",
-            modifier = GlanceModifier.width(28.dp),
-            style = TextStyle(color = secondaryText, fontSize = 12.sp),
-        )
-        Text(
-            text = "${arrival.minutes} min${arrival.destination?.let { "  $it" } ?: ""}",
-            style = TextStyle(color = primaryText, fontSize = 14.sp),
+            text = "${arrival.minutes} min",
+            style = TextStyle(
+                color = primaryText,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+            ),
         )
     }
 }
+
+private fun lineBadgeColor(line: String): ColorProvider =
+    ColorProvider(lineBadgeColors[(line.hashCode() and Int.MAX_VALUE) % lineBadgeColors.size])
 
 private const val MAX_ARRIVALS = 4
 

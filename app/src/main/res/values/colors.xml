@@ -6,4 +6,6 @@
     <color name="widget_secondary_text">#5D5E66</color>
     <color name="widget_accent">#385D92</color>
     <color name="widget_action_text">#FFFFFF</color>
+    <color name="widget_success_status">#2E7D32</color>
+    <color name="widget_error_status">#BA1A1A</color>
 </resources>
