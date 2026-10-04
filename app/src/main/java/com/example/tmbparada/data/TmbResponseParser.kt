@@ -44,10 +44,10 @@ object TmbResponseParser {
                 val line = lineKeys.firstNotNullOfOrNull { key ->
                     normalizedKeys[key]?.let { element[it]?.asText() }
                 }?.takeIf(String::isNotBlank)
-                val timeEntry = secondsKeys.firstNotNullOfOrNull { key ->
-                    normalizedKeys[key]?.let { key to it }
-                } ?: minuteKeys.firstNotNullOfOrNull { key ->
-                    normalizedKeys[key]?.let { key to it }
+                val timeEntry = (secondsKeys + minuteKeys).firstNotNullOfOrNull { key ->
+                    normalizedKeys[key]?.let { originalKey ->
+                        element[originalKey]?.let { value -> key to value }
+                    }
                 }
 
                 if (line != null && timeEntry != null) {

@@ -1,6 +1,8 @@
 # Local Android/Gradle configuration
 local.properties
 .gradle/
+.kotlin/
+gradle/gradle-daemon-jvm.properties
 build/
 */build/
 

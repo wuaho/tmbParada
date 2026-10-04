@@ -5,6 +5,7 @@ import androidx.glance.appwidget.updateAll
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.tmbparada.data.TmbApiClient
+import com.example.tmbparada.data.BusArrival
 import com.example.tmbparada.data.TmbStateRepository
 
 class TmbRefreshWorker(

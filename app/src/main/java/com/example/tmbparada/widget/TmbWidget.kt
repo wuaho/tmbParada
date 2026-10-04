@@ -21,11 +21,10 @@ import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import androidx.glance.layout.defaultWeight
 import androidx.glance.layout.height
 import androidx.glance.unit.ColorProvider
-import androidx.glance.unit.dp
-import androidx.glance.unit.sp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.tmbparada.R
 import com.example.tmbparada.data.BusArrival
 import com.example.tmbparada.data.TmbStateRepository
