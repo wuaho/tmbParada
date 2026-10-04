@@ -1,0 +1,28 @@
+app/src/main/res/values/colors.xml
+  s_512cbeaf8835de::t_4ae1769dc31c89 11
+app/src/main/java/com/example/tmbparada/widget/WidgetFreshness.kt
+  s_512cbeaf8835de::t_4ae1769dc31c89 4-5,18-21
+  s_512cbeaf8835de::t_db6aceb4fd4e91 22
+app/src/main/res/values-night/colors.xml
+  s_512cbeaf8835de::t_4ae1769dc31c89 11
+app/src/test/java/com/example/tmbparada/widget/WidgetFreshnessTest.kt
+  s_512cbeaf8835de::t_4ae1769dc31c89 16-24
+app/src/main/java/com/example/tmbparada/widget/TmbWidget.kt
+  s_512cbeaf8835de::t_4ae1769dc31c89 70,84,87,93,97-101,132-135,153-158,188-191,195,200-219
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "8a3ea0b9cd3a63ef91279a5aa3ad3ef8c3f81f85",
+  "prompts": {},
+  "sessions": {
+    "s_512cbeaf8835de": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_efcb11c9fffeU0COg21670Udxv",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "wuaho <juanjoserequenalama@gmail.com>"
+    }
+  }
+}
