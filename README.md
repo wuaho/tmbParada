@@ -45,8 +45,9 @@ Stop discovery is now local and offline: the app ships with
 from the TMB transit catalog. It contains `bus_lines`, `stops`, `line_stops`,
 and the FTS4 table `stops_fts`. The configuration screen searches stop codes,
 stop names, and line names locally. The database is copied by Room from the
-asset on first access. Network access is used only for live arrival requests
-after a stop has been selected.
+asset on first access and is refreshed through the Room database version when
+the packaged catalog changes. Network access is used only for live arrival
+requests after a stop has been selected.
 
 ## Build and Install
 

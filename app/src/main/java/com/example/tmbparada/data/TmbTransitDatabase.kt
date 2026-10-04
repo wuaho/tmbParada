@@ -107,7 +107,7 @@ interface TmbTransitDao {
         LineStopEntity::class,
         StopSearchFtsEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = false,
 )
 abstract class TmbTransitDatabase : RoomDatabase() {
@@ -115,18 +115,34 @@ abstract class TmbTransitDatabase : RoomDatabase() {
 
     companion object {
         private const val DATABASE_NAME = "tmb_transit.db"
+        private const val ASSET_VERSION = 2
+        private const val PREFERENCES_NAME = "tmb_transit_database"
+        private const val ASSET_VERSION_KEY = "asset_version"
 
         @Volatile
         private var instance: TmbTransitDatabase? = null
 
         fun getInstance(context: Context): TmbTransitDatabase =
             instance ?: synchronized(this) {
+                val appContext = context.applicationContext
+                val preferences = appContext.getSharedPreferences(
+                    PREFERENCES_NAME,
+                    Context.MODE_PRIVATE,
+                )
+                if (preferences.getInt(ASSET_VERSION_KEY, 0) != ASSET_VERSION) {
+                    instance?.close()
+                    instance = null
+                    appContext.deleteDatabase(DATABASE_NAME)
+                    preferences.edit().putInt(ASSET_VERSION_KEY, ASSET_VERSION).apply()
+                }
+
                 instance ?: Room.databaseBuilder(
-                    context.applicationContext,
+                    appContext,
                     TmbTransitDatabase::class.java,
                     DATABASE_NAME,
                 )
                     .createFromAsset(DATABASE_NAME)
+                    .fallbackToDestructiveMigration()
                     .build()
                     .also { instance = it }
             }
@@ -144,7 +160,7 @@ internal fun normalizeForSearch(value: String): String =
     Normalizer.normalize(value, Normalizer.Form.NFD)
         .replace(ACCENT_MARKS_REGEX, "")
 
-private fun String.toFtsPrefixQuery(): String =
+internal fun String.toFtsPrefixQuery(): String =
     trim()
         .split(WHITESPACE_REGEX)
         .filter(String::isNotBlank)
