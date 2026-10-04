@@ -1,0 +1,32 @@
+app/src/main/java/com/example/tmbparada/data/WidgetState.kt
+  s_512cbeaf8835de::t_966abc6391a501 15,44
+app/src/test/java/com/example/tmbparada/widget/WidgetFreshnessTest.kt
+  s_512cbeaf8835de::t_966abc6391a501 1-16
+app/src/main/res/values/colors.xml
+  s_512cbeaf8835de::t_966abc6391a501 9-10
+app/src/main/java/com/example/tmbparada/widget/TmbWidget.kt
+  s_512cbeaf8835de::t_966abc6391a501 4-6,12,15,18,22,26,28,30,68-78,83-92,97,124-140,142-143,145-148,152-162,164-165,168-169,171-180,182-187,195,198-215,217-219,222-227,232-233
+  s_512cbeaf8835de::t_bfd5edfc238ba7 234
+app/src/main/res/values-night/colors.xml
+  s_512cbeaf8835de::t_966abc6391a501 9-10
+app/src/main/java/com/example/tmbparada/widget/TmbRefreshWorker.kt
+  s_512cbeaf8835de::t_966abc6391a501 27,32-34,43,50-53,66-69
+app/src/main/java/com/example/tmbparada/widget/WidgetFreshness.kt
+  s_512cbeaf8835de::t_966abc6391a501 1-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "27ef746cd11e017621e43243fe9a7b028e4a4d91",
+  "prompts": {},
+  "sessions": {
+    "s_512cbeaf8835de": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_efcb11c9fffeU0COg21670Udxv",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "wuaho <juanjoserequenalama@gmail.com>"
+    }
+  }
+}
