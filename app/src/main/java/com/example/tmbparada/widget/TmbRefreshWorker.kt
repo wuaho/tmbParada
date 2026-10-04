@@ -1,7 +1,7 @@
 package com.example.tmbparada.widget
 
 import android.content.Context
-import androidx.glance.appwidget.updateAll
+import androidx.glance.appwidget.AppWidgetId
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.tmbparada.data.TmbApiClient
@@ -16,20 +16,23 @@ class TmbRefreshWorker(
     private val client = TmbApiClient()
 
     override suspend fun doWork(): Result {
-        val state = repository.read()
+        val widgetId = inputData.getInt(TmbRefreshScheduler.INPUT_WIDGET_ID, INVALID_WIDGET_ID)
+        if (widgetId == INVALID_WIDGET_ID) return Result.failure()
+
+        val state = repository.read(widgetId)
         val activeUntil = state.activeUntilEpochMillis ?: return Result.success()
         val now = System.currentTimeMillis()
 
         if (now >= activeUntil) {
-            repository.save(state.copy(activeUntilEpochMillis = null))
-            TmbWidget().updateAll(applicationContext)
+            repository.save(widgetId, state.copy(activeUntilEpochMillis = null))
+            TmbWidget().update(applicationContext, AppWidgetId(widgetId))
             return Result.success()
         }
 
         runCatching { client.fetchArrivals(state.stopId) }
             .onSuccess { response ->
                 val lines = response.arrivals.map(BusArrival::line).distinct()
-                repository.save(
+                repository.save(widgetId,
                     state.copy(
                         lines = lines,
                         arrivals = response.arrivals,
@@ -39,22 +42,27 @@ class TmbRefreshWorker(
                 )
             }
             .onFailure { error ->
-                repository.save(
+                repository.save(widgetId,
                     state.copy(errorMessage = error.message ?: "Could not query TMB"),
                 )
             }
 
         val remainingMillis = activeUntil - System.currentTimeMillis()
         if (remainingMillis > 0L) {
-            TmbWidget().updateAll(applicationContext)
+            TmbWidget().update(applicationContext, AppWidgetId(widgetId))
             TmbRefreshScheduler.scheduleNext(
                 applicationContext,
+                widgetId,
                 minOf(TmbRefreshScheduler.intervalMillis(), remainingMillis),
             )
         } else {
-            repository.save(repository.read().copy(activeUntilEpochMillis = null))
-            TmbWidget().updateAll(applicationContext)
+            repository.save(widgetId, repository.read(widgetId).copy(activeUntilEpochMillis = null))
+            TmbWidget().update(applicationContext, AppWidgetId(widgetId))
         }
         return Result.success()
+    }
+
+    private companion object {
+        const val INVALID_WIDGET_ID = -1
     }
 }

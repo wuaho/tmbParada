@@ -50,7 +50,12 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
 Open the application to check the configuration, then add **TMB Stop** from
-the home-screen widget picker.
+the home-screen widget picker. Android opens a configuration screen where you
+enter the numeric stop ID for that widget. Each widget instance can use a
+different stop.
+
+To reconfigure an existing widget, remove it from the home screen and add a
+new instance with the desired stop ID.
 
 ## Refresh Architecture
 

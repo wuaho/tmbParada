@@ -25,27 +25,32 @@ class TmbStateRepository(context: Context) {
     )
     private val json = Json { ignoreUnknownKeys = true }
 
-    fun read(): WidgetState {
-        val encoded = preferences.getString(KEY_STATE, null) ?: return WidgetState()
+    fun read(widgetId: Int): WidgetState {
+        val encoded = preferences.getString(stateKey(widgetId), null) ?: return WidgetState()
         return runCatching { json.decodeFromString<WidgetState>(encoded) }
             .getOrDefault(WidgetState())
     }
 
-    fun save(state: WidgetState) {
+    fun save(widgetId: Int, state: WidgetState) {
         preferences.edit()
-            .putString(KEY_STATE, json.encodeToString(state))
+            .putString(stateKey(widgetId), json.encodeToString(state))
             .apply()
     }
 
-    fun beginLive(nowMillis: Long = System.currentTimeMillis()): WidgetState {
-        return read().copy(
+    fun beginLive(widgetId: Int, nowMillis: Long = System.currentTimeMillis()): WidgetState {
+        return read(widgetId).copy(
             activeUntilEpochMillis = nowMillis + TmbConfig.LIVE_WINDOW_MILLIS,
             errorMessage = null,
-        ).also(::save)
+        ).also { save(widgetId, it) }
+    }
+
+    fun delete(widgetId: Int) {
+        preferences.edit().remove(stateKey(widgetId)).apply()
     }
 
     private companion object {
         const val PREFERENCES_NAME = "tmb_widget_state"
-        const val KEY_STATE = "state"
+
+        fun stateKey(widgetId: Int): String = "state_$widgetId"
     }
 }

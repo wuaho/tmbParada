@@ -5,6 +5,7 @@ import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.action.ActionParameters
 import androidx.glance.action.clickable
+import androidx.glance.appwidget.AppWidgetId
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.action.ActionCallback
@@ -35,12 +36,22 @@ import java.util.Locale
 
 class TmbWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = TmbWidget()
+
+    override fun onDeleted(context: Context, appWidgetIds: IntArray) {
+        super.onDeleted(context, appWidgetIds)
+        val repository = TmbStateRepository(context)
+        appWidgetIds.forEach { widgetId ->
+            TmbRefreshScheduler.cancel(context, widgetId)
+            repository.delete(widgetId)
+        }
+    }
 }
 
 class TmbWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        val widgetId = (id as AppWidgetId).appWidgetId
         provideContent {
-            TmbWidgetContent(TmbStateRepository(context).read())
+            TmbWidgetContent(TmbStateRepository(context).read(widgetId))
         }
     }
 }
@@ -162,7 +173,8 @@ class RefreshActionCallback : ActionCallback {
         glanceId: GlanceId,
         parameters: ActionParameters,
     ) {
-        TmbRefreshScheduler.start(context)
+        val widgetId = (glanceId as AppWidgetId).appWidgetId
+        TmbRefreshScheduler.start(context, widgetId)
         TmbWidget().update(context, glanceId)
     }
 }
