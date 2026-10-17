@@ -3,56 +3,44 @@ package com.example.tmbparada
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.example.tmbparada.data.TmbConfig
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.tmbparada.config.StopPickerActivity
+import com.example.tmbparada.ui.HomeScreen
+import com.example.tmbparada.ui.HomeViewModel
+import com.example.tmbparada.ui.theme.TmbTheme
 
 class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            TmbParadaTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    SetupScreen()
-                }
+    private val viewModel: HomeViewModel by viewModels {
+        viewModelFactory {
+            initializer {
+                val container = appContainer
+                HomeViewModel(
+                    store = container.widgetStateStore,
+                    installedWidgets = container.installedWidgets,
+                    credentialsConfigured = container.credentials.isConfigured,
+                )
             }
         }
     }
-}
 
-@Composable
-private fun SetupScreen() {
-    val credentialsConfigured = TmbConfig.appId.isNotBlank() && TmbConfig.appKey.isNotBlank()
-
-    Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Text("TMB Stop", style = MaterialTheme.typography.headlineMedium)
-        Text(
-            "Widget configured for stop ${TmbConfig.defaultStopId}.",
-            style = MaterialTheme.typography.bodyLarge,
-        )
-        Text(
-            if (credentialsConfigured) {
-                "TMB API configured. Add the widget to your home screen."
-            } else {
-                "TMB_APP_ID and TMB_APP_KEY are missing from local.properties. See README.md."
-            },
-            style = MaterialTheme.typography.bodyMedium,
-        )
+    override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
+        super.onCreate(savedInstanceState)
+        setContent {
+            TmbTheme {
+                HomeScreen(
+                    viewModel = viewModel,
+                    onChangeStop = { widgetId -> startActivity(StopPickerActivity.intent(this, widgetId)) },
+                )
+            }
+        }
     }
-}
 
-@Composable
-private fun TmbParadaTheme(content: @Composable () -> Unit) {
-    MaterialTheme(content = content)
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshWidgets()
+    }
 }
