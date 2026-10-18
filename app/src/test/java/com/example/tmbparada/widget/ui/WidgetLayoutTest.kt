@@ -54,6 +54,14 @@ class WidgetLayoutTest {
     }
 
     @Test
+    fun `narrow lists drop the destination, then the following bus, before clipping times`() {
+        assertEquals(WidgetLayout.ListColumns.FULL, WidgetLayout.forSize(300f, 100f).listColumns)
+        // The size of the widget in the reported screenshot: "5 min" was cut to "5 mi".
+        assertEquals(WidgetLayout.ListColumns.NO_DESTINATION, WidgetLayout.forSize(200f, 100f).listColumns)
+        assertEquals(WidgetLayout.ListColumns.NEXT_ONLY, WidgetLayout.forSize(150f, 95f).listColumns)
+    }
+
+    @Test
     fun `respects the glance child limit on very large widgets`() {
         val list = WidgetLayout.forSize(widthDp = 600f, heightDp = 420f)
         val grid = WidgetLayout.forSize(widthDp = 600f, heightDp = 900f)
