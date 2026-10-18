@@ -55,6 +55,26 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 Add **TMB Stop** from the launcher's widget picker, or open the app and tap
 **Add widget**. The stop picker opens automatically.
 
+## Releases and installing on your phone
+
+Every push to `main` runs the **Release** workflow, which builds a signed APK with
+the TMB credentials from the repository secrets and publishes it as a GitHub release
+(`v2.0.<run number>`).
+
+To receive updates automatically, install [Obtainium](https://github.com/ImranR98/Obtainium)
+on the phone, add the app with the URL `https://github.com/wuaho/tmbParada`, and let
+it install and update the APK.
+
+The workflow needs these repository secrets (Settings → Secrets and variables →
+Actions): `TMB_APP_ID`, `TMB_APP_KEY`, `RELEASE_KEYSTORE_BASE64` (the keystore,
+base64-encoded on one line), `RELEASE_KEYSTORE_PASSWORD`, `RELEASE_KEY_ALIAS`, and
+`RELEASE_KEY_PASSWORD`. Every release must be signed with the same keystore, or
+Android refuses to update the installed app; keep a private backup of it.
+
+The credentials are compiled into the published APK, so anyone who downloads it can
+extract them. That is acceptable for a personal project; for a wider audience, put
+the TMB requests behind a small server that holds the key.
+
 ## Architecture
 
 ```text

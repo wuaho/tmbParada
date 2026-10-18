@@ -30,8 +30,10 @@ android {
         applicationId = "com.example.tmbparada"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "2.0"
+        // CI passes the run number so every published build is an upgrade.
+        val buildNumber = System.getenv("VERSION_CODE")?.toIntOrNull()
+        versionCode = buildNumber ?: 2
+        versionName = if (buildNumber != null) "2.0.$buildNumber" else "2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -40,8 +42,24 @@ android {
         buildConfigField("String", "TMB_APP_KEY", secret("TMB_APP_KEY").asBuildConfigString())
     }
 
+    // Release signing comes from CI secrets; see "Releases" in README.md.
+    val releaseKeystore = System.getenv("RELEASE_KEYSTORE_PATH")?.let { file(it) }
+    signingConfigs {
+        if (releaseKeystore != null) {
+            create("release") {
+                storeFile = releaseKeystore
+                storePassword = System.getenv("RELEASE_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("RELEASE_KEY_ALIAS")
+                keyPassword = System.getenv("RELEASE_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            if (releaseKeystore != null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
