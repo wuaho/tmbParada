@@ -1,0 +1,47 @@
+<resources>
+    <string name="widget_description">Llegadas en directo de una parada de autobús de TMB</string>
+
+    <string name="widget_choose_stop_title">Elige una parada</string>
+    <string name="widget_choose_stop_body">Toca para elegir la parada de este widget</string>
+    <string name="widget_stop_code">Parada %1$s</string>
+    <string name="widget_refresh">Actualizar llegadas</string>
+    <string name="widget_now">ya</string>
+    <string name="widget_minutes">%1$d min</string>
+    <string name="widget_destination_unknown">Próximo bus</string>
+    <string name="widget_status_updating">Actualizando…</string>
+    <string name="widget_status_never">Aún sin actualizar</string>
+    <string name="widget_status_live">En directo · quedan %1$d min</string>
+    <string name="widget_status_just_now">Actualizado ahora</string>
+    <string name="widget_status_minutes_ago">Actualizado hace %1$d min</string>
+    <string name="widget_status_hours_ago">Actualizado hace %1$d h</string>
+    <string name="widget_placeholder_loading">Consultando llegadas…</string>
+    <string name="widget_placeholder_tap_to_refresh">Toca ↻ para ver las llegadas</string>
+    <string name="widget_placeholder_no_buses">No hay autobuses previstos</string>
+    <string name="widget_placeholder_failed">No se han podido cargar las llegadas</string>
+
+    <string name="error_missing_credentials">Faltan las claves de la API de TMB</string>
+    <string name="error_unauthorized">Claves de la API de TMB rechazadas</string>
+    <string name="error_network">Sin conexión</string>
+    <string name="error_server">Servicio de TMB no disponible</string>
+    <string name="error_invalid_response">Respuesta inesperada de TMB</string>
+
+    <string name="picker_title">Elige una parada</string>
+    <string name="picker_close">Cerrar</string>
+    <string name="picker_clear">Borrar búsqueda</string>
+    <string name="picker_search_hint">Nombre, código o línea</string>
+    <string name="picker_search_examples">Prueba «Selva de Mar», «2903» o «V29».</string>
+    <string name="picker_no_results">No se han encontrado paradas</string>
+    <string name="picker_current_stop">Parada actual</string>
+
+    <string name="home_intro">Consulta cuándo llegan los próximos autobuses a tu parada, directamente en la pantalla de inicio.</string>
+    <string name="home_api_title">API de TMB</string>
+    <string name="home_api_ready">Credenciales configuradas.</string>
+    <string name="home_api_missing">Faltan TMB_APP_ID y TMB_APP_KEY en local.properties. Añádelas y vuelve a compilar la app; consulta README.md.</string>
+    <string name="home_widgets_title">Tus widgets</string>
+    <string name="home_widgets_empty">Todavía no hay widgets en tu pantalla de inicio.</string>
+    <string name="home_widget_not_configured">Sin parada seleccionada</string>
+    <string name="home_change_stop">Cambiar parada</string>
+    <string name="home_add_widget">Añadir widget</string>
+    <string name="home_add_widget_manually">Mantén pulsada la pantalla de inicio, abre Widgets y añade TMB Stop.</string>
+    <string name="home_how_it_works">Los widgets no consumen datos en reposo. Toca ↻ en un widget para seguir las llegadas en directo durante 10 minutos, con actualizaciones cada 30 segundos.</string>
+</resources>

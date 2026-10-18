@@ -1,4 +1,52 @@
 <resources>
-    <string name="app_name">TMB Stop</string>
-    <string name="widget_description">Remaining minutes for a TMB bus stop</string>
+    <string name="app_name" translatable="false">TMB Stop</string>
+    <string name="widget_description">Live arrivals for a TMB bus stop</string>
+
+    <!-- Widget -->
+    <string name="widget_choose_stop_title">Choose a stop</string>
+    <string name="widget_choose_stop_body">Tap to pick the bus stop for this widget</string>
+    <string name="widget_stop_code">Stop %1$s</string>
+    <string name="widget_refresh">Refresh arrivals</string>
+    <string name="widget_now">now</string>
+    <string name="widget_minutes">%1$d min</string>
+    <string name="widget_destination_unknown">Next bus</string>
+    <string name="widget_status_updating">Updating…</string>
+    <string name="widget_status_never">Not updated yet</string>
+    <string name="widget_status_live">Live · %1$d min left</string>
+    <string name="widget_status_just_now">Updated just now</string>
+    <string name="widget_status_minutes_ago">Updated %1$d min ago</string>
+    <string name="widget_status_hours_ago">Updated %1$d h ago</string>
+    <string name="widget_placeholder_loading">Fetching live arrivals…</string>
+    <string name="widget_placeholder_tap_to_refresh">Tap ↻ to load arrivals</string>
+    <string name="widget_placeholder_no_buses">No buses due right now</string>
+    <string name="widget_placeholder_failed">Could not load arrivals</string>
+
+    <!-- Refresh errors -->
+    <string name="error_missing_credentials">TMB API keys missing</string>
+    <string name="error_unauthorized">TMB API keys rejected</string>
+    <string name="error_network">No connection</string>
+    <string name="error_server">TMB service unavailable</string>
+    <string name="error_invalid_response">Unexpected TMB response</string>
+
+    <!-- Stop picker -->
+    <string name="picker_title">Choose a bus stop</string>
+    <string name="picker_close">Close</string>
+    <string name="picker_clear">Clear search</string>
+    <string name="picker_search_hint">Stop name, code, or line</string>
+    <string name="picker_search_examples">Try “Selva de Mar”, “2903”, or “V29”.</string>
+    <string name="picker_no_results">No stops found</string>
+    <string name="picker_current_stop">Current stop</string>
+
+    <!-- Home -->
+    <string name="home_intro">See when the next buses reach your stop, right on your home screen.</string>
+    <string name="home_api_title">TMB API</string>
+    <string name="home_api_ready">Credentials configured.</string>
+    <string name="home_api_missing">TMB_APP_ID and TMB_APP_KEY are missing from local.properties. Add them and rebuild the app; see README.md.</string>
+    <string name="home_widgets_title">Your widgets</string>
+    <string name="home_widgets_empty">No widgets on your home screen yet.</string>
+    <string name="home_widget_not_configured">No stop selected</string>
+    <string name="home_change_stop">Change stop</string>
+    <string name="home_add_widget">Add widget</string>
+    <string name="home_add_widget_manually">Long-press your home screen, open Widgets, and add TMB Stop.</string>
+    <string name="home_how_it_works">Widgets do not use data while idle. Tap ↻ on a widget to follow arrivals live for 10 minutes, updated every 30 seconds.</string>
 </resources>

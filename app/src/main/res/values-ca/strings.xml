@@ -1,0 +1,47 @@
+<resources>
+    <string name="widget_description">Arribades en directe d’una parada d’autobús de TMB</string>
+
+    <string name="widget_choose_stop_title">Tria una parada</string>
+    <string name="widget_choose_stop_body">Toca per triar la parada d’aquest widget</string>
+    <string name="widget_stop_code">Parada %1$s</string>
+    <string name="widget_refresh">Actualitza les arribades</string>
+    <string name="widget_now">ara</string>
+    <string name="widget_minutes">%1$d min</string>
+    <string name="widget_destination_unknown">Proper bus</string>
+    <string name="widget_status_updating">Actualitzant…</string>
+    <string name="widget_status_never">Encara sense actualitzar</string>
+    <string name="widget_status_live">En directe · queden %1$d min</string>
+    <string name="widget_status_just_now">Actualitzat ara</string>
+    <string name="widget_status_minutes_ago">Actualitzat fa %1$d min</string>
+    <string name="widget_status_hours_ago">Actualitzat fa %1$d h</string>
+    <string name="widget_placeholder_loading">Consultant les arribades…</string>
+    <string name="widget_placeholder_tap_to_refresh">Toca ↻ per veure les arribades</string>
+    <string name="widget_placeholder_no_buses">No hi ha autobusos previstos</string>
+    <string name="widget_placeholder_failed">No s’han pogut carregar les arribades</string>
+
+    <string name="error_missing_credentials">Falten les claus de l’API de TMB</string>
+    <string name="error_unauthorized">Claus de l’API de TMB rebutjades</string>
+    <string name="error_network">Sense connexió</string>
+    <string name="error_server">Servei de TMB no disponible</string>
+    <string name="error_invalid_response">Resposta inesperada de TMB</string>
+
+    <string name="picker_title">Tria una parada</string>
+    <string name="picker_close">Tanca</string>
+    <string name="picker_clear">Esborra la cerca</string>
+    <string name="picker_search_hint">Nom, codi o línia</string>
+    <string name="picker_search_examples">Prova «Selva de Mar», «2903» o «V29».</string>
+    <string name="picker_no_results">No s’han trobat parades</string>
+    <string name="picker_current_stop">Parada actual</string>
+
+    <string name="home_intro">Consulta quan arriben els propers autobusos a la teva parada, directament a la pantalla d’inici.</string>
+    <string name="home_api_title">API de TMB</string>
+    <string name="home_api_ready">Credencials configurades.</string>
+    <string name="home_api_missing">Falten TMB_APP_ID i TMB_APP_KEY a local.properties. Afegeix-les i torna a compilar l’app; consulta README.md.</string>
+    <string name="home_widgets_title">Els teus widgets</string>
+    <string name="home_widgets_empty">Encara no hi ha widgets a la pantalla d’inici.</string>
+    <string name="home_widget_not_configured">Sense parada seleccionada</string>
+    <string name="home_change_stop">Canvia la parada</string>
+    <string name="home_add_widget">Afegeix el widget</string>
+    <string name="home_add_widget_manually">Mantén premuda la pantalla d’inici, obre Widgets i afegeix TMB Stop.</string>
+    <string name="home_how_it_works">Els widgets no consumeixen dades en repòs. Toca ↻ en un widget per seguir les arribades en directe durant 10 minuts, amb actualitzacions cada 30 segons.</string>
+</resources>

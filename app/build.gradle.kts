@@ -1,11 +1,11 @@
 import java.util.Properties
 
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("com.google.devtools.ksp")
-    id("org.jetbrains.kotlin.plugin.serialization")
-    id("org.jetbrains.kotlin.plugin.compose")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
 }
 
 val localProperties = Properties().apply {
@@ -15,12 +15,12 @@ val localProperties = Properties().apply {
     }
 }
 
+/** Reads a secret from local.properties, falling back to an environment variable (for CI). */
+fun secret(name: String): String =
+    localProperties.getProperty(name) ?: System.getenv(name).orEmpty()
+
 fun String.asBuildConfigString(): String =
     "\"${replace("\\", "\\\\").replace("\"", "\\\"")}\""
-
-val tmbAppId = localProperties.getProperty("TMB_APP_ID", "")
-val tmbAppKey = localProperties.getProperty("TMB_APP_KEY", "")
-val tmbStopId = localProperties.getProperty("TMB_STOP_ID", "1001")
 
 android {
     namespace = "com.example.tmbparada"
@@ -30,19 +30,36 @@ android {
         applicationId = "com.example.tmbparada"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        // CI passes the run number so every published build is an upgrade.
+        val buildNumber = System.getenv("VERSION_CODE")?.toIntOrNull()
+        versionCode = buildNumber ?: 2
+        versionName = if (buildNumber != null) "2.0.$buildNumber" else "2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
 
-        buildConfigField("String", "TMB_APP_ID", tmbAppId.asBuildConfigString())
-        buildConfigField("String", "TMB_APP_KEY", tmbAppKey.asBuildConfigString())
-        buildConfigField("String", "TMB_STOP_ID", tmbStopId.asBuildConfigString())
+        buildConfigField("String", "TMB_APP_ID", secret("TMB_APP_ID").asBuildConfigString())
+        buildConfigField("String", "TMB_APP_KEY", secret("TMB_APP_KEY").asBuildConfigString())
+    }
+
+    // Release signing comes from CI secrets; see "Releases" in README.md.
+    val releaseKeystore = System.getenv("RELEASE_KEYSTORE_PATH")?.let { file(it) }
+    signingConfigs {
+        if (releaseKeystore != null) {
+            create("release") {
+                storeFile = releaseKeystore
+                storePassword = System.getenv("RELEASE_KEYSTORE_PASSWORD")
+                keyAlias = "tmbstop"
+                keyPassword = System.getenv("RELEASE_KEYSTORE_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
         release {
+            if (releaseKeystore != null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -68,33 +85,32 @@ android {
     packaging {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
     }
-
-    sourceSets["main"].assets.srcDir("src/main/assets")
-}
-
-ksp {
-    arg("room.schemaLocation", "$projectDir/schemas")
-    arg("room.incremental", "true")
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.15.0")
-    implementation("androidx.activity:activity-compose:1.10.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
-    implementation("androidx.compose.ui:ui:1.7.8")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.7.8")
-    implementation("androidx.compose.material3:material3:1.3.1")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.androidx.compose.material3)
 
-    implementation("androidx.glance:glance-appwidget:1.1.1")
-    implementation("androidx.room:room-runtime:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
-    implementation("androidx.work:work-runtime-ktx:2.10.0")
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.datastore.preferences)
 
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation(libs.okhttp)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.coroutines.android)
 
-    ksp("androidx.room:room-compiler:2.6.1")
+    ksp(libs.androidx.room.compiler)
 
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("org.jetbrains.kotlin:kotlin-test:2.0.21")
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.okhttp.mockwebserver)
 }
