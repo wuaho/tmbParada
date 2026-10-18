@@ -127,7 +127,7 @@ private fun StopContent(model: WidgetUiModel.Stop, layout: WidgetLayout, openSto
             val visible = model.rows.take(layout.capacity)
             when (layout.mode) {
                 WidgetLayout.Mode.LIST -> Column(modifier = GlanceModifier.fillMaxWidth().defaultWeight()) {
-                    visible.forEach { row -> ArrivalListRow(row, isStale = model.isStale) }
+                    visible.forEach { row -> ArrivalListRow(row, layout.listColumns, isStale = model.isStale) }
                 }
                 WidgetLayout.Mode.GRID -> ArrivalGrid(visible, layout.columns, isStale = model.isStale)
             }
@@ -205,10 +205,16 @@ private fun RefreshButton(isRefreshing: Boolean, size: Dp) {
     }
 }
 
-/** Line badge, destination, then the following bus (dimmed) and the next bus, in fixed columns. */
+/**
+ * Line badge, destination, then the following bus (dimmed) and the next bus, in fixed columns
+ * so times line up. Narrow widgets drop the destination and then the following bus.
+ */
 @Composable
-private fun ArrivalListRow(row: ArrivalRow, isStale: Boolean) {
+private fun ArrivalListRow(row: ArrivalRow, columns: WidgetLayout.ListColumns, isStale: Boolean) {
     val context = LocalContext.current
+    val following = row.minutes.getOrNull(1)
+        ?.takeIf { columns != WidgetLayout.ListColumns.NEXT_ONLY }
+        ?.let { context.minutesText(it, approximate = isStale) }
 
     Row(
         modifier = GlanceModifier.fillMaxWidth().height(WidgetLayout.ROW_HEIGHT.dp),
@@ -216,21 +222,27 @@ private fun ArrivalListRow(row: ArrivalRow, isStale: Boolean) {
     ) {
         LineBadge(row.line, width = 44.dp, height = 24.dp, fontSize = 12)
         Spacer(GlanceModifier.width(8.dp))
-        Text(
-            text = row.destination ?: context.getString(R.string.widget_destination_unknown),
-            modifier = GlanceModifier.defaultWeight(),
-            style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 13.sp),
-            maxLines = 1,
-        )
-        Text(
-            text = row.minutes.getOrNull(1)?.let { context.minutesText(it, approximate = isStale) }.orEmpty(),
-            modifier = GlanceModifier.width(52.dp),
-            style = followingTimeStyle(TextAlign.End),
-            maxLines = 1,
-        )
+        if (columns == WidgetLayout.ListColumns.FULL) {
+            Text(
+                text = row.destination ?: context.getString(R.string.widget_destination_unknown),
+                modifier = GlanceModifier.defaultWeight(),
+                style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 13.sp),
+                maxLines = 1,
+            )
+        } else {
+            Spacer(GlanceModifier.defaultWeight())
+        }
+        if (columns != WidgetLayout.ListColumns.NEXT_ONLY) {
+            Text(
+                text = following.orEmpty(),
+                modifier = GlanceModifier.width(WidgetLayout.FOLLOWING_WIDTH.dp),
+                style = followingTimeStyle(TextAlign.End),
+                maxLines = 1,
+            )
+        }
         Text(
             text = context.minutesText(row.minutes.first(), approximate = isStale),
-            modifier = GlanceModifier.width(64.dp),
+            modifier = GlanceModifier.width(WidgetLayout.NEXT_WIDTH.dp),
             style = nextTimeStyle(isStale, fontSize = 15, textAlign = TextAlign.End),
             maxLines = 1,
         )

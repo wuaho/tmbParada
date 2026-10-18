@@ -2,4 +2,6 @@
     <!-- Shown by the launcher until the Glance content is ready. -->
     <color name="widget_loading_background">#F7F8FC</color>
     <color name="widget_loading_text">#1A1B20</color>
+    <!-- Red of the TMB network, for the launcher icon. -->
+    <color name="tmb_red">#E2001A</color>
 </resources>

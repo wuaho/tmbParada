@@ -14,8 +14,12 @@ data class WidgetLayout(
     val compactHeader: Boolean,
     val columns: Int,
     val rows: Int,
+    val listColumns: ListColumns = ListColumns.FULL,
 ) {
     enum class Mode { LIST, GRID }
+
+    /** What a list row shows besides the badge and the next bus, from widest to narrowest. */
+    enum class ListColumns { FULL, NO_DESTINATION, NEXT_ONLY }
 
     val capacity: Int get() = columns * rows
 
@@ -41,6 +45,12 @@ data class WidgetLayout(
         /** Below this width a list row cannot show destination and both times. */
         const val LIST_MIN_WIDTH = 230f
 
+        /** List row columns: badge plus its spacing, destination, following and next bus. */
+        const val BADGE_WIDTH = 52f
+        const val DESTINATION_MIN_WIDTH = 72f
+        const val FOLLOWING_WIDTH = 56f
+        const val NEXT_WIDTH = 64f
+
         /** Glance containers accept at most 10 children. */
         const val MAX_LIST_ROWS = 8
         const val MAX_GRID_ROWS = 4
@@ -62,7 +72,14 @@ data class WidgetLayout(
             }
 
             val listRows = fit(contentHeight, ROW_HEIGHT, 0f).coerceIn(1, MAX_LIST_ROWS)
-            return WidgetLayout(Mode.LIST, compact, columns = 1, rows = listRows)
+            return WidgetLayout(Mode.LIST, compact, columns = 1, rows = listRows, listColumns = listColumns(contentWidth))
+        }
+
+        /** Drops the destination, then the following bus, so the next bus is never clipped. */
+        private fun listColumns(contentWidth: Float): ListColumns = when {
+            contentWidth >= BADGE_WIDTH + DESTINATION_MIN_WIDTH + FOLLOWING_WIDTH + NEXT_WIDTH -> ListColumns.FULL
+            contentWidth >= BADGE_WIDTH + FOLLOWING_WIDTH + NEXT_WIDTH -> ListColumns.NO_DESTINATION
+            else -> ListColumns.NEXT_ONLY
         }
 
         /** How many items of [size] fit in [available], separated by [gap]. */
