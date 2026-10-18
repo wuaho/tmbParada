@@ -10,7 +10,7 @@
     <string name="widget_destination_unknown">Proper bus</string>
     <string name="widget_status_updating">Actualitzant…</string>
     <string name="widget_status_never">Encara sense actualitzar</string>
-    <string name="widget_status_live">En directe · queden %1$d min</string>
+    <string name="widget_status_live">En directe · %1$s</string>
     <string name="widget_status_just_now">Actualitzat ara</string>
     <string name="widget_status_minutes_ago">Actualitzat fa %1$d min</string>
     <string name="widget_status_hours_ago">Actualitzat fa %1$d h</string>
@@ -43,5 +43,16 @@
     <string name="home_change_stop">Canvia la parada</string>
     <string name="home_add_widget">Afegeix el widget</string>
     <string name="home_add_widget_manually">Mantén premuda la pantalla d’inici, obre Widgets i afegeix TMB Stop.</string>
-    <string name="home_how_it_works">Els widgets no consumeixen dades en repòs. Toca ↻ en un widget per seguir les arribades en directe durant 10 minuts, amb actualitzacions cada 30 segons.</string>
+    <string name="home_how_it_works">Els widgets no consumeixen dades en repòs. Toca ↻ en un widget per seguir les arribades en directe durant 10 minuts: s’actualitzen cada 20 segons, apareixen a la pantalla de bloqueig i reps un avís quan un autobús és a 3 minuts.</string>
+
+    <!-- Live session notification -->
+    <string name="widget_status_live_no_data">En directe</string>
+    <string name="live_channel_name">Arribades en directe</string>
+    <string name="live_channel_description">Arribades a la teva parada mentre hi ha una sessió en directe</string>
+    <string name="alert_channel_name">Autobús a punt d’arribar</string>
+    <string name="alert_channel_description">Un avís quan un autobús està a punt d’arribar a la teva parada</string>
+    <string name="live_until">En directe fins a les %1$s</string>
+    <string name="live_action_refresh">Actualitza</string>
+    <string name="live_action_stop">Atura</string>
+    <string name="alert_title">El %1$s arriba en %2$s</string>
 </resources>

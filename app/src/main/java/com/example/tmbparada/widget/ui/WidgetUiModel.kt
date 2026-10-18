@@ -35,7 +35,8 @@ enum class Placeholder {
 sealed interface Status {
     data object Updating : Status
     data object NeverUpdated : Status
-    data class Live(val minutesLeft: Int) : Status
+    /** [updatedAtMillis] is the time of the last successful update, if any. */
+    data class Live(val minutesLeft: Int, val updatedAtMillis: Long?) : Status
     data class Updated(val minutesAgo: Long) : Status
     data class Failed(val error: RefreshError) : Status
 }

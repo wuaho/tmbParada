@@ -34,7 +34,7 @@ object WidgetPresenter {
         val status = when {
             isRefreshing -> Status.Updating
             state.lastError != null -> Status.Failed(state.lastError)
-            liveUntil != null -> Status.Live(minutesLeft(liveUntil, nowMillis))
+            liveUntil != null -> Status.Live(minutesLeft(liveUntil, nowMillis), snapshot?.fetchedAtMillis)
             ageMillis != null -> Status.Updated(minutesAgo = ageMillis / MILLIS_PER_MINUTE)
             else -> Status.NeverUpdated
         }

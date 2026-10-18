@@ -1,6 +1,5 @@
 package com.example.tmbparada.widget.ui
 
-import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
@@ -41,7 +40,6 @@ import androidx.glance.unit.ColorProvider
 import com.example.tmbparada.R
 import com.example.tmbparada.config.StopPickerActivity
 import com.example.tmbparada.domain.BusLines
-import com.example.tmbparada.domain.model.RefreshError
 import com.example.tmbparada.widget.RefreshAction
 
 @Composable
@@ -333,38 +331,3 @@ private fun followingTimeStyle(textAlign: TextAlign) = TextStyle(
     textAlign = textAlign,
 )
 
-private fun Context.minutesText(minutes: Int, approximate: Boolean): String {
-    val text = if (minutes == 0) getString(R.string.widget_now) else getString(R.string.widget_minutes, minutes)
-    return if (approximate) "~$text" else text
-}
-
-private fun Context.statusText(status: Status): String = when (status) {
-    Status.Updating -> getString(R.string.widget_status_updating)
-    Status.NeverUpdated -> getString(R.string.widget_status_never)
-    is Status.Live -> getString(R.string.widget_status_live, status.minutesLeft)
-    is Status.Failed -> errorText(status.error)
-    is Status.Updated -> when {
-        status.minutesAgo < 1 -> getString(R.string.widget_status_just_now)
-        status.minutesAgo < 60 -> getString(R.string.widget_status_minutes_ago, status.minutesAgo.toInt())
-        else -> getString(R.string.widget_status_hours_ago, (status.minutesAgo / 60).toInt())
-    }
-}
-
-private fun Context.placeholderText(placeholder: Placeholder): String = getString(
-    when (placeholder) {
-        Placeholder.LOADING -> R.string.widget_placeholder_loading
-        Placeholder.TAP_TO_REFRESH -> R.string.widget_placeholder_tap_to_refresh
-        Placeholder.NO_BUSES -> R.string.widget_placeholder_no_buses
-        Placeholder.FAILED -> R.string.widget_placeholder_failed
-    },
-)
-
-fun Context.errorText(error: RefreshError): String = getString(
-    when (error) {
-        RefreshError.MISSING_CREDENTIALS -> R.string.error_missing_credentials
-        RefreshError.UNAUTHORIZED -> R.string.error_unauthorized
-        RefreshError.NETWORK -> R.string.error_network
-        RefreshError.SERVER -> R.string.error_server
-        RefreshError.INVALID_RESPONSE -> R.string.error_invalid_response
-    },
-)

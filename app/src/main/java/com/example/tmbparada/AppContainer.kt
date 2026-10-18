@@ -14,9 +14,12 @@ import com.example.tmbparada.domain.StopCatalog
 import com.example.tmbparada.domain.WidgetStateStore
 import com.example.tmbparada.domain.refresh.LiveRefreshController
 import com.example.tmbparada.domain.refresh.LiveRefreshPolicy
+import com.example.tmbparada.live.LiveSessionScheduler
 import com.example.tmbparada.widget.GlanceWidgetRenderer
 import com.example.tmbparada.widget.InstalledWidgets
-import com.example.tmbparada.widget.work.WorkManagerRefreshScheduler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
@@ -25,6 +28,9 @@ class AppContainer(context: Context) {
     private val appContext = context.applicationContext
 
     val clock: Clock = Clock.System
+
+    /** For work that must outlive the screen or receiver that started it. */
+    val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     val credentials = TmbCredentials(
         appId = BuildConfig.TMB_APP_ID,
@@ -57,7 +63,9 @@ class AppContainer(context: Context) {
         LiveRefreshController(
             store = widgetStateStore,
             arrivals = arrivalsRepository,
-            scheduler = WorkManagerRefreshScheduler(appContext),
+            scheduler = LiveSessionScheduler(appContext, applicationScope) { widgetId ->
+                liveRefresh.runRefreshStep(widgetId)
+            },
             renderer = GlanceWidgetRenderer(appContext),
             policy = LiveRefreshPolicy(),
             clock = clock,

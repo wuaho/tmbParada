@@ -54,7 +54,7 @@ class WidgetPresenterTest {
             ),
         )
 
-        assertEquals(Status.Live(minutesLeft = 5), model.status)
+        assertEquals(Status.Live(minutesLeft = 5, updatedAtMillis = now), model.status)
         assertEquals(null, model.placeholder)
         assertFalse(model.isStale)
     }
