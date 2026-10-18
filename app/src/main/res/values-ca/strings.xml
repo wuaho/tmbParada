@@ -4,18 +4,15 @@
     <string name="widget_choose_stop_title">Tria una parada</string>
     <string name="widget_choose_stop_body">Toca per triar la parada d’aquest widget</string>
     <string name="widget_stop_code">Parada %1$s</string>
+    <string name="widget_start">Veure arribades</string>
+    <string name="widget_start_hint">En directe durant 10 minuts</string>
     <string name="widget_refresh">Actualitza les arribades</string>
     <string name="widget_now">Arribant</string>
     <string name="widget_minutes">%1$d min</string>
     <string name="widget_destination_unknown">Proper bus</string>
     <string name="widget_status_updating">Actualitzant…</string>
-    <string name="widget_status_never">Encara sense actualitzar</string>
     <string name="widget_status_live">En directe · %1$s</string>
-    <string name="widget_status_just_now">Actualitzat ara</string>
-    <string name="widget_status_minutes_ago">Actualitzat fa %1$d min</string>
-    <string name="widget_status_hours_ago">Actualitzat fa %1$d h</string>
     <string name="widget_placeholder_loading">Consultant les arribades…</string>
-    <string name="widget_placeholder_tap_to_refresh">Toca ↻ per veure les arribades</string>
     <string name="widget_placeholder_no_buses">No hi ha autobusos previstos</string>
     <string name="widget_placeholder_failed">No s’han pogut carregar les arribades</string>
 

@@ -5,6 +5,7 @@ import com.example.tmbparada.domain.model.ArrivalsSnapshot
 import com.example.tmbparada.domain.model.BusStop
 import com.example.tmbparada.domain.model.RefreshError
 import com.example.tmbparada.domain.model.WidgetState
+import com.example.tmbparada.domain.model.WidgetTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -14,7 +15,11 @@ class WidgetPresenterTest {
     private val now = 10 * MINUTE
     private val stop = BusStop("2903", "Selva de Mar")
 
-    private fun present(state: WidgetState) = WidgetPresenter.present(state, now) as WidgetUiModel.Stop
+    private val liveUntil = now + 5 * MINUTE
+
+    /** Presents a widget during a live session. */
+    private fun present(state: WidgetState) =
+        WidgetPresenter.present(state.copy(liveUntilMillis = state.liveUntilMillis ?: liveUntil), now) as WidgetUiModel.Active
 
     @Test
     fun `widgets without a stop ask to be configured`() {
@@ -74,36 +79,58 @@ class WidgetPresenterTest {
     }
 
     @Test
-    fun `idle widgets report how old their data is and mark it stale`() {
+    fun `data that ages during a session is marked stale`() {
         val fresh = present(WidgetState(stop = stop, snapshot = ArrivalsSnapshot(emptyList(), now - 2 * MINUTE)))
         val stale = present(WidgetState(stop = stop, snapshot = ArrivalsSnapshot(emptyList(), now - 5 * MINUTE)))
 
-        assertEquals(Status.Updated(minutesAgo = 2), fresh.status)
         assertEquals(Placeholder.NO_BUSES, fresh.placeholder)
         assertFalse(fresh.isStale)
         assertTrue(stale.isStale)
     }
 
     @Test
-    fun `very old arrivals are hidden`() {
+    fun `without a live session arrivals are hidden and the widget offers to start one`() {
         val arrivals = listOf(Arrival("7", null, now + MINUTE))
-        val model = present(WidgetState(stop = stop, snapshot = ArrivalsSnapshot(arrivals, now - 61 * MINUTE)))
+        val ended = WidgetState(
+            stop = stop,
+            snapshot = ArrivalsSnapshot(arrivals, now - MINUTE),
+            liveUntilMillis = now - 1L,
+        )
 
-        assertTrue(model.rows.isEmpty())
-        assertEquals(Placeholder.TAP_TO_REFRESH, model.placeholder)
+        assertEquals(
+            WidgetUiModel.Idle("Selva de Mar", "2903", error = null, theme = WidgetTheme.SYSTEM),
+            WidgetPresenter.present(ended, now),
+        )
+        assertEquals(
+            WidgetUiModel.Idle("Selva de Mar", "2903", error = null, theme = WidgetTheme.SYSTEM),
+            WidgetPresenter.present(ended.copy(liveUntilMillis = null), now),
+        )
+    }
+
+    @Test
+    fun `idle widgets only keep errors the user has to fix`() {
+        val idle = WidgetState(stop = stop)
+
+        assertEquals(
+            RefreshError.MISSING_CREDENTIALS,
+            (WidgetPresenter.present(idle.copy(lastError = RefreshError.MISSING_CREDENTIALS), now) as WidgetUiModel.Idle).error,
+        )
+        assertEquals(
+            null,
+            (WidgetPresenter.present(idle.copy(lastError = RefreshError.NETWORK), now) as WidgetUiModel.Idle).error,
+        )
     }
 
     @Test
     fun `in-flight requests show progress until they time out`() {
-        val loading = present(WidgetState(stop = stop, refreshStartedAtMillis = now - 5_000L))
-        val interrupted = present(WidgetState(stop = stop, refreshStartedAtMillis = now - 2 * MINUTE))
+        val loading = WidgetPresenter.present(WidgetState(stop = stop, refreshStartedAtMillis = now - 5_000L), now)
+        val interrupted = WidgetPresenter.present(WidgetState(stop = stop, refreshStartedAtMillis = now - 2 * MINUTE), now)
 
-        assertTrue(loading.isRefreshing)
-        assertEquals(Status.Updating, loading.status)
-        assertEquals(Placeholder.LOADING, loading.placeholder)
-        assertFalse(interrupted.isRefreshing)
-        assertEquals(Status.NeverUpdated, interrupted.status)
-        assertEquals(Placeholder.TAP_TO_REFRESH, interrupted.placeholder)
+        val active = loading as WidgetUiModel.Active
+        assertTrue(active.isRefreshing)
+        assertEquals(Status.Updating, active.status)
+        assertEquals(Placeholder.LOADING, active.placeholder)
+        assertTrue(interrupted is WidgetUiModel.Idle)
     }
 
     @Test

@@ -7,7 +7,19 @@ import com.example.tmbparada.domain.model.WidgetTheme
 sealed interface WidgetUiModel {
     data object NotConfigured : WidgetUiModel
 
-    data class Stop(
+    /**
+     * No live session: arrivals are hidden, since they would soon be wrong, and the widget
+     * offers to start one. Only errors the user must fix (API keys) are shown.
+     */
+    data class Idle(
+        val stopName: String?,
+        val stopCode: String,
+        val error: RefreshError?,
+        val theme: WidgetTheme,
+    ) : WidgetUiModel
+
+    /** A live session is running or a request is in flight. */
+    data class Active(
         val stopName: String?,
         val stopCode: String,
         val rows: List<ArrivalRow>,
@@ -30,16 +42,13 @@ data class ArrivalRow(
 /** Shown instead of rows when there are no arrivals to list. */
 enum class Placeholder {
     LOADING,
-    TAP_TO_REFRESH,
     NO_BUSES,
     FAILED,
 }
 
 sealed interface Status {
     data object Updating : Status
-    data object NeverUpdated : Status
     /** [updatedAtMillis] is the time of the last successful update, if any. */
     data class Live(val minutesLeft: Int, val updatedAtMillis: Long?) : Status
-    data class Updated(val minutesAgo: Long) : Status
     data class Failed(val error: RefreshError) : Status
 }

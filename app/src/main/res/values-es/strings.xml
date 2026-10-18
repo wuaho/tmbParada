@@ -4,18 +4,15 @@
     <string name="widget_choose_stop_title">Elige una parada</string>
     <string name="widget_choose_stop_body">Toca para elegir la parada de este widget</string>
     <string name="widget_stop_code">Parada %1$s</string>
+    <string name="widget_start">Ver llegadas</string>
+    <string name="widget_start_hint">En directo durante 10 minutos</string>
     <string name="widget_refresh">Actualizar llegadas</string>
     <string name="widget_now">Llegando</string>
     <string name="widget_minutes">%1$d min</string>
     <string name="widget_destination_unknown">Próximo bus</string>
     <string name="widget_status_updating">Actualizando…</string>
-    <string name="widget_status_never">Aún sin actualizar</string>
     <string name="widget_status_live">En directo · %1$s</string>
-    <string name="widget_status_just_now">Actualizado ahora</string>
-    <string name="widget_status_minutes_ago">Actualizado hace %1$d min</string>
-    <string name="widget_status_hours_ago">Actualizado hace %1$d h</string>
     <string name="widget_placeholder_loading">Consultando llegadas…</string>
-    <string name="widget_placeholder_tap_to_refresh">Toca ↻ para ver las llegadas</string>
     <string name="widget_placeholder_no_buses">No hay autobuses previstos</string>
     <string name="widget_placeholder_failed">No se han podido cargar las llegadas</string>
 

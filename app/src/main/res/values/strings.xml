@@ -6,18 +6,15 @@
     <string name="widget_choose_stop_title">Choose a stop</string>
     <string name="widget_choose_stop_body">Tap to pick the bus stop for this widget</string>
     <string name="widget_stop_code">Stop %1$s</string>
+    <string name="widget_start">See arrivals</string>
+    <string name="widget_start_hint">Live for 10 minutes</string>
     <string name="widget_refresh">Refresh arrivals</string>
     <string name="widget_now">Arriving</string>
     <string name="widget_minutes">%1$d min</string>
     <string name="widget_destination_unknown">Next bus</string>
     <string name="widget_status_updating">Updating…</string>
-    <string name="widget_status_never">Not updated yet</string>
     <string name="widget_status_live">Live · %1$s</string>
-    <string name="widget_status_just_now">Updated just now</string>
-    <string name="widget_status_minutes_ago">Updated %1$d min ago</string>
-    <string name="widget_status_hours_ago">Updated %1$d h ago</string>
     <string name="widget_placeholder_loading">Fetching live arrivals…</string>
-    <string name="widget_placeholder_tap_to_refresh">Tap ↻ to load arrivals</string>
     <string name="widget_placeholder_no_buses">No buses due right now</string>
     <string name="widget_placeholder_failed">Could not load arrivals</string>
 

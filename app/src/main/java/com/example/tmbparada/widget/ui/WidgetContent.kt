@@ -49,7 +49,12 @@ fun WidgetContent(widgetId: Int, model: WidgetUiModel) {
     val openStopPicker = actionStartActivity(StopPickerActivity.intent(context, widgetId))
     val size = LocalSize.current
     val layout = WidgetLayout.forSize(size.width.value, size.height.value)
-    val palette = widgetPalette((model as? WidgetUiModel.Stop)?.theme ?: WidgetTheme.SYSTEM)
+    val theme = when (model) {
+        is WidgetUiModel.Active -> model.theme
+        is WidgetUiModel.Idle -> model.theme
+        WidgetUiModel.NotConfigured -> WidgetTheme.SYSTEM
+    }
+    val palette = widgetPalette(theme)
 
     CompositionLocalProvider(LocalWidgetPalette provides palette) {
         Box(
@@ -62,7 +67,8 @@ fun WidgetContent(widgetId: Int, model: WidgetUiModel) {
         ) {
             when (model) {
                 WidgetUiModel.NotConfigured -> NotConfiguredContent(openStopPicker)
-                is WidgetUiModel.Stop -> StopContent(model, layout, openStopPicker)
+                is WidgetUiModel.Idle -> IdleContent(model, layout, openStopPicker)
+                is WidgetUiModel.Active -> ActiveContent(model, layout, openStopPicker)
             }
         }
     }
@@ -106,7 +112,7 @@ private fun NotConfiguredContent(openStopPicker: Action) {
 }
 
 @Composable
-private fun StopContent(model: WidgetUiModel.Stop, layout: WidgetLayout, openStopPicker: Action) {
+private fun ActiveContent(model: WidgetUiModel.Active, layout: WidgetLayout, openStopPicker: Action) {
     val context = LocalContext.current
 
     Column(modifier = GlanceModifier.fillMaxSize()) {
@@ -118,7 +124,7 @@ private fun StopContent(model: WidgetUiModel.Stop, layout: WidgetLayout, openSto
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    text = context.placeholderText(model.placeholder ?: Placeholder.TAP_TO_REFRESH),
+                    text = context.placeholderText(model.placeholder ?: Placeholder.LOADING),
                     style = TextStyle(
                         color = LocalWidgetPalette.current.secondaryText,
                         fontSize = 13.sp,
@@ -140,8 +146,92 @@ private fun StopContent(model: WidgetUiModel.Stop, layout: WidgetLayout, openSto
     }
 }
 
+/**
+ * Shown when no live session runs: old arrivals would only mislead, so the widget offers to
+ * start a session instead. The whole body is the button; the title still changes the stop.
+ */
 @Composable
-private fun Header(model: WidgetUiModel.Stop, layout: WidgetLayout, openStopPicker: Action) {
+private fun IdleContent(model: WidgetUiModel.Idle, layout: WidgetLayout, openStopPicker: Action) {
+    val context = LocalContext.current
+    val palette = LocalWidgetPalette.current
+    val stopLabel = context.getString(R.string.widget_stop_code, model.stopCode)
+    val note = model.error?.let { context.errorText(it) }
+        ?: context.getString(R.string.widget_start_hint).takeIf { !layout.compactHeader }
+
+    Column(modifier = GlanceModifier.fillMaxSize()) {
+        Column(modifier = GlanceModifier.fillMaxWidth().clickable(openStopPicker)) {
+            Text(
+                text = model.stopName ?: stopLabel,
+                style = TextStyle(
+                    color = palette.text,
+                    fontSize = if (layout.compactHeader) 14.sp else 15.sp,
+                    fontWeight = FontWeight.Bold,
+                ),
+                maxLines = 1,
+            )
+            if (!layout.compactHeader && model.stopName != null) {
+                Text(text = stopLabel, style = TextStyle(color = palette.secondaryText, fontSize = 11.sp), maxLines = 1)
+            }
+        }
+        Column(
+            modifier = GlanceModifier
+                .fillMaxWidth()
+                .defaultWeight()
+                .clickable(actionRunCallback<RefreshAction>()),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            StartButton(compact = layout.compactHeader)
+            note?.let {
+                Spacer(GlanceModifier.height(6.dp))
+                Text(
+                    text = it,
+                    style = TextStyle(
+                        color = if (model.error != null) palette.error else palette.secondaryText,
+                        fontSize = 11.sp,
+                        textAlign = TextAlign.Center,
+                    ),
+                    maxLines = 2,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun StartButton(compact: Boolean) {
+    val context = LocalContext.current
+    val palette = LocalWidgetPalette.current
+    val height = if (compact) 30.dp else 40.dp
+    Row(
+        modifier = GlanceModifier
+            .height(height)
+            .cornerRadius(height / 2)
+            .background(palette.accent)
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Image(
+            provider = ImageProvider(R.drawable.ic_play),
+            contentDescription = null,
+            modifier = GlanceModifier.size(if (compact) 16.dp else 18.dp),
+            colorFilter = ColorFilter.tint(palette.onAccent),
+        )
+        Spacer(GlanceModifier.width(6.dp))
+        Text(
+            text = context.getString(R.string.widget_start),
+            style = TextStyle(
+                color = palette.onAccent,
+                fontSize = if (compact) 13.sp else 14.sp,
+                fontWeight = FontWeight.Bold,
+            ),
+            maxLines = 1,
+        )
+    }
+}
+
+@Composable
+private fun Header(model: WidgetUiModel.Active, layout: WidgetLayout, openStopPicker: Action) {
     val context = LocalContext.current
     val stopLabel = context.getString(R.string.widget_stop_code, model.stopCode)
     val statusLabel = context.statusText(model.status)

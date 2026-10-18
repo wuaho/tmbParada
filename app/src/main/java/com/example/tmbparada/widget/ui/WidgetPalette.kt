@@ -13,8 +13,9 @@ data class WidgetPalette(
     val background: ColorProvider,
     val text: ColorProvider,
     val secondaryText: ColorProvider,
-    /** Time of the next bus. */
+    /** Time of the next bus, and the start button. */
     val accent: ColorProvider,
+    val onAccent: ColorProvider,
     /** A bus that is arriving now. */
     val arriving: ColorProvider,
     val error: ColorProvider,
@@ -35,6 +36,7 @@ fun widgetPalette(theme: WidgetTheme): WidgetPalette = when (theme) {
             text = colors.onSurface,
             secondaryText = colors.onSurfaceVariant,
             accent = colors.primary,
+            onAccent = colors.onPrimary,
             arriving = colors.tertiary,
             error = colors.error,
             chip = colors.secondaryContainer,
@@ -47,6 +49,7 @@ fun widgetPalette(theme: WidgetTheme): WidgetPalette = when (theme) {
         text = dayNight(day = Color(0xFF1A1A1A), night = Color(0xFFF2F2F2)),
         secondaryText = dayNight(day = Color(0xFF5F5F5F), night = Color(0xFFB8B8B8)),
         accent = dayNight(day = TMB_RED, night = TMB_RED_LIGHT),
+        onAccent = dayNight(day = Color.White, night = Color(0xFF2B0006)),
         arriving = dayNight(day = TMB_RED, night = TMB_RED_LIGHT),
         error = dayNight(day = Color(0xFFB3261E), night = Color(0xFFF2B8B5)),
         chip = dayNight(day = Color(0xFFFDE8EA), night = Color(0xFF3B1C1F)),
@@ -58,6 +61,7 @@ fun widgetPalette(theme: WidgetTheme): WidgetPalette = when (theme) {
         text = ColorProvider(Color.White),
         secondaryText = ColorProvider(Color(0xD9FFFFFF)),
         accent = ColorProvider(Color.White),
+        onAccent = ColorProvider(Color(0xFF1A1A1A)),
         arriving = ColorProvider(Color(0xFFFF9E80)),
         error = ColorProvider(Color(0xFFFFB4AB)),
         chip = ColorProvider(Color(0x33FFFFFF)),
