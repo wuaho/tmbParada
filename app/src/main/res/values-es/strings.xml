@@ -10,7 +10,7 @@
     <string name="widget_destination_unknown">Próximo bus</string>
     <string name="widget_status_updating">Actualizando…</string>
     <string name="widget_status_never">Aún sin actualizar</string>
-    <string name="widget_status_live">En directo · quedan %1$d min</string>
+    <string name="widget_status_live">En directo · %1$s</string>
     <string name="widget_status_just_now">Actualizado ahora</string>
     <string name="widget_status_minutes_ago">Actualizado hace %1$d min</string>
     <string name="widget_status_hours_ago">Actualizado hace %1$d h</string>
@@ -43,5 +43,16 @@
     <string name="home_change_stop">Cambiar parada</string>
     <string name="home_add_widget">Añadir widget</string>
     <string name="home_add_widget_manually">Mantén pulsada la pantalla de inicio, abre Widgets y añade TMB Stop.</string>
-    <string name="home_how_it_works">Los widgets no consumen datos en reposo. Toca ↻ en un widget para seguir las llegadas en directo durante 10 minutos, con actualizaciones cada 30 segundos.</string>
+    <string name="home_how_it_works">Los widgets no consumen datos en reposo. Toca ↻ en un widget para seguir las llegadas en directo durante 10 minutos: se actualizan cada 20 segundos, aparecen en la pantalla de bloqueo y recibes un aviso cuando un autobús está a 3 minutos.</string>
+
+    <!-- Live session notification -->
+    <string name="widget_status_live_no_data">En directo</string>
+    <string name="live_channel_name">Llegadas en directo</string>
+    <string name="live_channel_description">Llegadas a tu parada mientras hay una sesión en directo</string>
+    <string name="alert_channel_name">Autobús a punto de llegar</string>
+    <string name="alert_channel_description">Un aviso cuando un autobús está a punto de llegar a tu parada</string>
+    <string name="live_until">En directo hasta las %1$s</string>
+    <string name="live_action_refresh">Actualizar</string>
+    <string name="live_action_stop">Parar</string>
+    <string name="alert_title">El %1$s llega en %2$s</string>
 </resources>

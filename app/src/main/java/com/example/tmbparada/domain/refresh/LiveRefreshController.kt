@@ -57,6 +57,13 @@ class LiveRefreshController(
         renderer.render(widgetId)
     }
 
+    /** Ends a live session early, e.g. from the notification. */
+    suspend fun stopLiveSession(widgetId: Int) {
+        scheduler.cancel(widgetId)
+        store.update(widgetId, policy::endSession)
+        renderer.render(widgetId)
+    }
+
     suspend fun onWidgetDeleted(widgetId: Int) {
         scheduler.cancel(widgetId)
         store.delete(widgetId)

@@ -30,6 +30,7 @@ import com.example.tmbparada.R
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, onChangeStop: (Int) -> Unit) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    RequestNotificationPermission()
 
     Scaffold(
         topBar = { TopAppBar(title = { Text(stringResource(R.string.app_name)) }) },

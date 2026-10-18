@@ -39,6 +39,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.tmbparada.R
 import com.example.tmbparada.domain.model.BusStop
 import com.example.tmbparada.ui.LineBadges
+import com.example.tmbparada.ui.RequestNotificationPermission
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,6 +52,7 @@ fun StopPickerScreen(
     val results by viewModel.results.collectAsStateWithLifecycle()
     val currentStop by viewModel.currentStop.collectAsStateWithLifecycle()
     val focusRequester = remember { FocusRequester() }
+    RequestNotificationPermission()
 
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
 

@@ -12,7 +12,7 @@
     <string name="widget_destination_unknown">Next bus</string>
     <string name="widget_status_updating">Updating…</string>
     <string name="widget_status_never">Not updated yet</string>
-    <string name="widget_status_live">Live · %1$d min left</string>
+    <string name="widget_status_live">Live · %1$s</string>
     <string name="widget_status_just_now">Updated just now</string>
     <string name="widget_status_minutes_ago">Updated %1$d min ago</string>
     <string name="widget_status_hours_ago">Updated %1$d h ago</string>
@@ -48,5 +48,16 @@
     <string name="home_change_stop">Change stop</string>
     <string name="home_add_widget">Add widget</string>
     <string name="home_add_widget_manually">Long-press your home screen, open Widgets, and add TMB Stop.</string>
-    <string name="home_how_it_works">Widgets do not use data while idle. Tap ↻ on a widget to follow arrivals live for 10 minutes, updated every 30 seconds.</string>
+    <string name="home_how_it_works">Widgets do not use data while idle. Tap ↻ on a widget to follow arrivals live for 10 minutes: updates every 20 seconds, a notification on the lock screen, and an alert when a bus is 3 minutes away.</string>
+
+    <!-- Live session notification -->
+    <string name="widget_status_live_no_data">Live</string>
+    <string name="live_channel_name">Live arrivals</string>
+    <string name="live_channel_description">Arrivals for your stop while a live session is running</string>
+    <string name="alert_channel_name">Bus approaching</string>
+    <string name="alert_channel_description">One alert when a bus is about to reach your stop</string>
+    <string name="live_until">Live until %1$s</string>
+    <string name="live_action_refresh">Refresh</string>
+    <string name="live_action_stop">Stop</string>
+    <string name="alert_title">%1$s arrives in %2$s</string>
 </resources>

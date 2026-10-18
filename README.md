@@ -15,7 +15,11 @@ when the next TMB Barcelona buses reach a stop you choose.
   tiles, and short ones a compact header so the first row is always complete
   (`WidgetLayout`).
 - **Zero cost while idle.** The widget never polls in the background. Tapping ↻ starts
-  a ten-minute live session that refreshes every 30 seconds and then stops.
+  a ten-minute live session that refreshes every 20 seconds and then stops.
+- **Live on the lock screen.** During a session an ongoing notification shows the next
+  buses, with a clock counting from the last update and Refresh / Stop buttons. On
+  Android 16 it asks to be shown as a Live Update (lock screen and status bar chip).
+- **Time to go.** One alert per line when its next bus is three minutes away.
 - **Honest times.** Arrivals are stored as absolute timestamps, so the countdown is
   recomputed on every render, rounded down. Data older than five minutes is shown as
   approximate (`~3 min`) and data older than an hour is hidden.
@@ -93,7 +97,8 @@ app/src/main/java/com/example/tmbparada/
 │   ├── arrivals/    OkHttp client, tolerant JSON parser, ArrivalsRepository impl
 │   ├── catalog/     Room database over the packaged stop catalog (FTS4 search)
 │   └── widgetstate/ DataStore persistence of WidgetState (JSON per widget)
-├── widget/          Glance widget, refresh action, WorkManager scheduler/worker
+├── live/            Foreground service, scheduler, notifications, arrival alerts
+├── widget/          Glance widget and refresh action
 │   └── ui/          WidgetPresenter (state → UI model, pure) and Glance composables
 ├── config/          Stop picker: Activity, ViewModel, Compose screen
 ├── ui/              Home screen and Material theme
@@ -109,9 +114,11 @@ codec, and the widget presenter is plain Kotlin and covered by JVM unit tests.
 
 1. The stop picker calls `LiveRefreshController.configure`, which stores the stop and
    starts a live session.
-2. A live session stores `liveUntilMillis` and enqueues a one-time `LiveRefreshWorker`.
-   Each worker run calls `runRefreshStep`: fetch arrivals, store the result, and chain
-   the next run with `APPEND_OR_REPLACE` — or end the session once the window closes.
+2. A live session stores `liveUntilMillis` and starts `LiveSessionService`, a foreground
+   service, so Android does not defer the updates. `LiveSessionScheduler` runs
+   `runRefreshStep` as coroutines: fetch arrivals, store the result, and schedule the
+   next step — or end the session once the window closes. The service mirrors the
+   stored sessions as notifications and stops when none is live.
 3. `TmbWidget` observes the widget's state in DataStore and renders it through
    `WidgetPresenter`, so every write updates the home screen. The provider sets
    `updatePeriodMillis="0"`: Android never wakes the app on its own.
@@ -128,5 +135,6 @@ asset's schema, because Room validates its identity hash.
 ## Customization
 
 - Live session length and refresh interval: `LiveRefreshPolicy` defaults.
+- Alert threshold: `ArrivalAlerts.THRESHOLD_MINUTES`.
 - Staleness thresholds: constants in `WidgetPresenter`.
 - Line colors: `BusLines`.

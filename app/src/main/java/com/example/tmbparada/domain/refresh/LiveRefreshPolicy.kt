@@ -63,6 +63,6 @@ class LiveRefreshPolicy(
 
     companion object {
         const val DEFAULT_SESSION_DURATION_MILLIS = 10 * 60_000L
-        const val DEFAULT_REFRESH_INTERVAL_MILLIS = 30_000L
+        const val DEFAULT_REFRESH_INTERVAL_MILLIS = 20_000L
     }
 }

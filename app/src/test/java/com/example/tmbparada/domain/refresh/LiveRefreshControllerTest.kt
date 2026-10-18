@@ -111,6 +111,19 @@ class LiveRefreshControllerTest {
     }
 
     @Test
+    fun `stopping a session cancels its work and keeps the last arrivals`() = runTest {
+        arrivals.result = ArrivalsResult.Success(listOf(Arrival("7", null, 120_000L)))
+        controller.configure(WIDGET, stop)
+        controller.runRefreshStep(WIDGET)
+
+        controller.stopLiveSession(WIDGET)
+
+        assertEquals(Call.Cancel(WIDGET), scheduler.calls.last())
+        assertNull(store.get(WIDGET).liveUntilMillis)
+        assertEquals(1, store.get(WIDGET).snapshot?.arrivals?.size)
+    }
+
+    @Test
     fun `deleting a widget cancels its work and forgets its state`() = runTest {
         controller.configure(WIDGET, stop)
 

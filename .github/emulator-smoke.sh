@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Smoke test on an emulator: walks through the main flows and saves screenshots.
 set -u
+live_failed=
 OUT=screenshots
 mkdir -p "$OUT"
 PKG=com.example.tmbparada
@@ -42,7 +43,8 @@ for node in re.finditer(r"<node [^>]*>", xml):
 adb shell settings put global window_animation_scale 0
 adb shell settings put global transition_animation_scale 0
 adb shell settings put global animator_duration_scale 0
-adb install -r app/build/outputs/apk/debug/app-debug.apk
+# -g grants runtime permissions, such as notifications, so no dialog covers the screen.
+adb install -r -g app/build/outputs/apk/debug/app-debug.apk
 adb logcat -c
 
 adb shell am start -W -n "$PKG/.MainActivity"
@@ -80,6 +82,31 @@ shot 07-widget-refreshing
 sleep 6
 shot 08-widget-after-refresh
 
+# The live session runs as a foreground service with an ongoing notification.
+if adb shell dumpsys activity services "$PKG" | grep -q "LiveSessionService"; then
+  echo "Live session service running"
+else
+  echo "Live session service NOT running"
+  live_failed=1
+fi
+if adb shell dumpsys notification --noredact | grep -q "pkg=$PKG"; then
+  echo "Live notification posted"
+else
+  echo "Live notification NOT posted"
+  live_failed=1
+fi
+adb shell cmd statusbar expand-notifications
+sleep 2
+shot 08b-notification-shade
+adb shell cmd statusbar collapse
+adb shell input keyevent KEYCODE_SLEEP
+sleep 2
+adb shell input keyevent KEYCODE_WAKEUP
+sleep 2
+shot 08c-lock-screen
+adb shell wm dismiss-keyguard
+sleep 2
+
 adb shell cmd uimode night yes
 sleep 5
 shot 09-widget-dark
@@ -97,3 +124,7 @@ if grep -q "$PKG" "$OUT/crash.txt"; then
   exit 1
 fi
 echo "No crashes"
+if [ -n "${live_failed:-}" ]; then
+  echo "Live session checks failed"
+  exit 1
+fi
