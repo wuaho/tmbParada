@@ -1,13 +1,13 @@
 package com.example.tmbparada.widget.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.ColorFilter
 import androidx.glance.GlanceModifier
-import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
@@ -40,6 +40,7 @@ import androidx.glance.unit.ColorProvider
 import com.example.tmbparada.R
 import com.example.tmbparada.config.StopPickerActivity
 import com.example.tmbparada.domain.BusLines
+import com.example.tmbparada.domain.model.WidgetTheme
 import com.example.tmbparada.widget.RefreshAction
 
 @Composable
@@ -48,18 +49,21 @@ fun WidgetContent(widgetId: Int, model: WidgetUiModel) {
     val openStopPicker = actionStartActivity(StopPickerActivity.intent(context, widgetId))
     val size = LocalSize.current
     val layout = WidgetLayout.forSize(size.width.value, size.height.value)
+    val palette = widgetPalette((model as? WidgetUiModel.Stop)?.theme ?: WidgetTheme.SYSTEM)
 
-    Box(
-        modifier = GlanceModifier
-            .fillMaxSize()
-            .appWidgetBackground()
-            .background(GlanceTheme.colors.widgetBackground)
-            .cornerRadius(20.dp)
-            .padding(layout.padding.dp),
-    ) {
-        when (model) {
-            WidgetUiModel.NotConfigured -> NotConfiguredContent(openStopPicker)
-            is WidgetUiModel.Stop -> StopContent(model, layout, openStopPicker)
+    CompositionLocalProvider(LocalWidgetPalette provides palette) {
+        Box(
+            modifier = GlanceModifier
+                .fillMaxSize()
+                .appWidgetBackground()
+                .background(palette.background)
+                .cornerRadius(20.dp)
+                .padding(layout.padding.dp),
+        ) {
+            when (model) {
+                WidgetUiModel.NotConfigured -> NotConfiguredContent(openStopPicker)
+                is WidgetUiModel.Stop -> StopContent(model, layout, openStopPicker)
+            }
         }
     }
 }
@@ -76,13 +80,13 @@ private fun NotConfiguredContent(openStopPicker: Action) {
             provider = ImageProvider(R.drawable.ic_bus),
             contentDescription = null,
             modifier = GlanceModifier.size(32.dp),
-            colorFilter = ColorFilter.tint(GlanceTheme.colors.primary),
+            colorFilter = ColorFilter.tint(LocalWidgetPalette.current.accent),
         )
         Spacer(GlanceModifier.height(8.dp))
         Text(
             text = context.getString(R.string.widget_choose_stop_title),
             style = TextStyle(
-                color = GlanceTheme.colors.onSurface,
+                color = LocalWidgetPalette.current.text,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
@@ -92,7 +96,7 @@ private fun NotConfiguredContent(openStopPicker: Action) {
         Text(
             text = context.getString(R.string.widget_choose_stop_body),
             style = TextStyle(
-                color = GlanceTheme.colors.onSurfaceVariant,
+                color = LocalWidgetPalette.current.secondaryText,
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center,
             ),
@@ -116,7 +120,7 @@ private fun StopContent(model: WidgetUiModel.Stop, layout: WidgetLayout, openSto
                 Text(
                     text = context.placeholderText(model.placeholder ?: Placeholder.TAP_TO_REFRESH),
                     style = TextStyle(
-                        color = GlanceTheme.colors.onSurfaceVariant,
+                        color = LocalWidgetPalette.current.secondaryText,
                         fontSize = 13.sp,
                         textAlign = TextAlign.Center,
                     ),
@@ -130,6 +134,7 @@ private fun StopContent(model: WidgetUiModel.Stop, layout: WidgetLayout, openSto
                     visible.forEach { row -> ArrivalListRow(row, layout.listColumns, isStale = model.isStale) }
                 }
                 WidgetLayout.Mode.GRID -> ArrivalGrid(visible, layout.columns, isStale = model.isStale)
+                WidgetLayout.Mode.HERO -> HeroContent(visible, isStale = model.isStale)
             }
         }
     }
@@ -141,6 +146,7 @@ private fun Header(model: WidgetUiModel.Stop, layout: WidgetLayout, openStopPick
     val stopLabel = context.getString(R.string.widget_stop_code, model.stopCode)
     val statusLabel = context.statusText(model.status)
     val headerHeight = layout.headerHeight.dp
+    val palette = LocalWidgetPalette.current
 
     Row(
         modifier = GlanceModifier.fillMaxWidth().height(headerHeight),
@@ -150,7 +156,7 @@ private fun Header(model: WidgetUiModel.Stop, layout: WidgetLayout, openStopPick
             Text(
                 text = model.stopName ?: stopLabel,
                 style = TextStyle(
-                    color = GlanceTheme.colors.onSurface,
+                    color = palette.text,
                     fontSize = if (layout.compactHeader) 14.sp else 15.sp,
                     fontWeight = FontWeight.Bold,
                 ),
@@ -158,18 +164,23 @@ private fun Header(model: WidgetUiModel.Stop, layout: WidgetLayout, openStopPick
             )
             // Short widgets drop the status line; the refresh button still shows progress.
             if (!layout.compactHeader) {
-                Text(
-                    text = if (model.stopName != null) "$stopLabel · $statusLabel" else statusLabel,
-                    style = TextStyle(
-                        color = if (model.status is Status.Failed) {
-                            GlanceTheme.colors.error
-                        } else {
-                            GlanceTheme.colors.onSurfaceVariant
-                        },
-                        fontSize = 11.sp,
-                    ),
-                    maxLines = 1,
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (model.status is Status.Live) {
+                        LiveDot()
+                        Spacer(GlanceModifier.width(5.dp))
+                    }
+                    Text(
+                        text = if (model.stopName != null) "$stopLabel · $statusLabel" else statusLabel,
+                        style = TextStyle(
+                            color = if (model.status is Status.Failed) palette.error else palette.secondaryText,
+                            fontSize = 11.sp,
+                        ),
+                        maxLines = 1,
+                    )
+                }
+            } else if (model.status is Status.Live) {
+                // Compact headers have no status line, so the live dot sits under the title.
+                LiveDot()
             }
         }
         Spacer(GlanceModifier.width(8.dp))
@@ -185,21 +196,21 @@ private fun RefreshButton(isRefreshing: Boolean, size: Dp) {
         modifier = GlanceModifier
             .size(size)
             .cornerRadius(size / 2)
-            .background(GlanceTheme.colors.secondaryContainer)
+            .background(LocalWidgetPalette.current.chip)
             .clickable(actionRunCallback<RefreshAction>()),
         contentAlignment = Alignment.Center,
     ) {
         if (isRefreshing) {
             CircularProgressIndicator(
                 modifier = GlanceModifier.size(iconSize),
-                color = GlanceTheme.colors.onSecondaryContainer,
+                color = LocalWidgetPalette.current.onChip,
             )
         } else {
             Image(
                 provider = ImageProvider(R.drawable.ic_refresh),
                 contentDescription = context.getString(R.string.widget_refresh),
                 modifier = GlanceModifier.size(iconSize),
-                colorFilter = ColorFilter.tint(GlanceTheme.colors.onSecondaryContainer),
+                colorFilter = ColorFilter.tint(LocalWidgetPalette.current.onChip),
             )
         }
     }
@@ -226,7 +237,7 @@ private fun ArrivalListRow(row: ArrivalRow, columns: WidgetLayout.ListColumns, i
             Text(
                 text = row.destination ?: context.getString(R.string.widget_destination_unknown),
                 modifier = GlanceModifier.defaultWeight(),
-                style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 13.sp),
+                style = TextStyle(color = LocalWidgetPalette.current.text, fontSize = 13.sp),
                 maxLines = 1,
             )
         } else {
@@ -243,7 +254,7 @@ private fun ArrivalListRow(row: ArrivalRow, columns: WidgetLayout.ListColumns, i
         Text(
             text = context.minutesText(row.minutes.first(), approximate = isStale),
             modifier = GlanceModifier.width(WidgetLayout.NEXT_WIDTH.dp),
-            style = nextTimeStyle(isStale, fontSize = 15, textAlign = TextAlign.End),
+            style = nextTimeStyle(row.minutes.first(), isStale, fontSize = 15, textAlign = TextAlign.End),
             maxLines = 1,
         )
     }
@@ -274,7 +285,7 @@ private fun ArrivalTile(row: ArrivalRow, isStale: Boolean, modifier: GlanceModif
     Column(
         modifier = modifier
             .cornerRadius(14.dp)
-            .background(GlanceTheme.colors.secondaryContainer)
+            .background(LocalWidgetPalette.current.chip)
             .padding(horizontal = 8.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -283,7 +294,7 @@ private fun ArrivalTile(row: ArrivalRow, isStale: Boolean, modifier: GlanceModif
             Spacer(GlanceModifier.width(6.dp))
             Text(
                 text = row.destination ?: context.getString(R.string.widget_destination_unknown),
-                style = TextStyle(color = GlanceTheme.colors.onSecondaryContainer, fontSize = 11.sp),
+                style = TextStyle(color = LocalWidgetPalette.current.onChip, fontSize = 11.sp),
                 maxLines = 1,
             )
         }
@@ -291,7 +302,7 @@ private fun ArrivalTile(row: ArrivalRow, isStale: Boolean, modifier: GlanceModif
         Row(verticalAlignment = Alignment.Bottom) {
             Text(
                 text = context.minutesText(row.minutes.first(), approximate = isStale),
-                style = nextTimeStyle(isStale, fontSize = 18, textAlign = TextAlign.Start),
+                style = nextTimeStyle(row.minutes.first(), isStale, fontSize = 18, textAlign = TextAlign.Start),
                 maxLines = 1,
             )
             row.minutes.getOrNull(1)?.let { following ->
@@ -328,18 +339,108 @@ private fun LineBadge(line: String, width: Dp, height: Dp, fontSize: Int) {
     }
 }
 
+/** An arriving bus is highlighted, and in a smaller size so "Arriving" fits the time column. */
 @Composable
-private fun nextTimeStyle(isStale: Boolean, fontSize: Int, textAlign: TextAlign) = TextStyle(
-    color = if (isStale) GlanceTheme.colors.onSurfaceVariant else GlanceTheme.colors.primary,
-    fontSize = fontSize.sp,
-    fontWeight = FontWeight.Bold,
+private fun nextTimeStyle(minutes: Int, isStale: Boolean, fontSize: Int, textAlign: TextAlign): TextStyle {
+    val palette = LocalWidgetPalette.current
+    val arriving = minutes == 0 && !isStale
+    return TextStyle(
+        color = when {
+            isStale -> palette.secondaryText
+            arriving -> palette.arriving
+            else -> palette.accent
+        },
+        fontSize = if (minutes == 0) (fontSize - 2).sp else fontSize.sp,
+        fontWeight = FontWeight.Bold,
+        textAlign = textAlign,
+    )
+}
+
+@Composable
+private fun followingTimeStyle(textAlign: TextAlign) = TextStyle(
+    color = LocalWidgetPalette.current.secondaryText,
+    fontSize = 12.sp,
     textAlign = textAlign,
 )
 
 @Composable
-private fun followingTimeStyle(textAlign: TextAlign) = TextStyle(
-    color = GlanceTheme.colors.onSurfaceVariant,
-    fontSize = 12.sp,
-    textAlign = textAlign,
-)
+private fun LiveDot() {
+    Box(
+        modifier = GlanceModifier
+            .size(7.dp)
+            .cornerRadius(4.dp)
+            .background(LocalWidgetPalette.current.live),
+    ) {}
+}
+
+/**
+ * Large view for small square widgets: the next bus (the favorite line first) in big type,
+ * then one compact line per other route if there is room.
+ */
+@Composable
+private fun HeroContent(rows: List<ArrivalRow>, isStale: Boolean) {
+    val context = LocalContext.current
+    val palette = LocalWidgetPalette.current
+    val row = rows.first()
+    val minutes = row.minutes.first()
+
+    Column(modifier = GlanceModifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            LineBadge(row.line, width = 40.dp, height = 22.dp, fontSize = 12)
+            Spacer(GlanceModifier.width(6.dp))
+            Text(
+                text = row.destination ?: context.getString(R.string.widget_destination_unknown),
+                style = TextStyle(color = palette.secondaryText, fontSize = 12.sp),
+                maxLines = 1,
+            )
+        }
+        if (minutes == 0) {
+            Text(
+                text = context.minutesText(0, approximate = isStale),
+                style = nextTimeStyle(0, isStale, fontSize = 28, textAlign = TextAlign.Start),
+                maxLines = 1,
+            )
+        } else {
+            Row(verticalAlignment = Alignment.Bottom) {
+                Text(
+                    text = if (isStale) "~$minutes" else minutes.toString(),
+                    style = nextTimeStyle(minutes, isStale, fontSize = 36, textAlign = TextAlign.Start),
+                    maxLines = 1,
+                )
+                Spacer(GlanceModifier.width(4.dp))
+                Text(
+                    text = context.getString(R.string.widget_minutes_unit),
+                    modifier = GlanceModifier.padding(bottom = 7.dp),
+                    style = nextTimeStyle(minutes, isStale, fontSize = 15, textAlign = TextAlign.Start),
+                    maxLines = 1,
+                )
+            }
+        }
+        row.minutes.getOrNull(1)?.let { following ->
+            Text(
+                text = context.getString(R.string.widget_then, context.minutesText(following, approximate = isStale)),
+                style = followingTimeStyle(TextAlign.Start),
+                maxLines = 1,
+            )
+        }
+        rows.drop(1).forEach { other -> HeroExtraLine(other, isStale) }
+    }
+}
+
+@Composable
+private fun HeroExtraLine(row: ArrivalRow, isStale: Boolean) {
+    val context = LocalContext.current
+    Row(
+        modifier = GlanceModifier.fillMaxWidth().height(WidgetLayout.HERO_EXTRA_ROW_HEIGHT.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        LineBadge(row.line, width = 32.dp, height = 16.dp, fontSize = 10)
+        Spacer(GlanceModifier.defaultWeight())
+        Text(
+            text = context.minutesText(row.minutes.first(), approximate = isStale),
+            style = nextTimeStyle(row.minutes.first(), isStale, fontSize = 13, textAlign = TextAlign.End),
+            maxLines = 1,
+        )
+    }
+}
 

@@ -37,12 +37,14 @@ class WidgetLayoutTest {
     }
 
     @Test
-    fun `narrow widgets stack single tiles`() {
-        val layout = WidgetLayout.forSize(widthDp = 170f, heightDp = 200f)
+    fun `widgets fitting a single tile column show the next bus in large type`() {
+        val twoByTwo = WidgetLayout.forSize(widthDp = 170f, heightDp = 170f)
+        val tall = WidgetLayout.forSize(widthDp = 170f, heightDp = 200f)
 
-        assertEquals(Mode.GRID, layout.mode)
-        assertEquals(1, layout.columns)
-        assertEquals(2, layout.rows)
+        assertEquals(Mode.HERO, twoByTwo.mode)
+        assertEquals(1, twoByTwo.rows)
+        assertEquals(Mode.HERO, tall.mode)
+        assertEquals(3, tall.rows)
     }
 
     @Test

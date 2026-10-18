@@ -5,7 +5,9 @@ import com.example.tmbparada.domain.model.ArrivalsResult
 import com.example.tmbparada.domain.model.ArrivalsSnapshot
 import com.example.tmbparada.domain.model.BusStop
 import com.example.tmbparada.domain.model.RefreshError
+import com.example.tmbparada.domain.model.WidgetSettings
 import com.example.tmbparada.domain.model.WidgetState
+import com.example.tmbparada.domain.model.WidgetTheme
 import com.example.tmbparada.testing.FakeArrivalsRepository
 import com.example.tmbparada.testing.FakeClock
 import com.example.tmbparada.testing.FakeRefreshScheduler
@@ -52,6 +54,31 @@ class LiveRefreshControllerTest {
         assertNull(state.lastError)
         assertEquals(60_000L, state.liveUntilMillis)
         assertEquals(listOf<Call>(Call.Now(WIDGET)), scheduler.calls)
+        assertEquals(listOf(WIDGET), renderer.rendered)
+    }
+
+    @Test
+    fun `changing the stop keeps settings but drops a favorite line it does not serve`() {
+        runTest {
+            val settings = WidgetSettings(favoriteLine = "7", theme = WidgetTheme.TMB)
+            store.update(WIDGET) { WidgetState(stop = stop, settings = settings) }
+
+            controller.configure(WIDGET, BusStop("1001", "Pl. Catalunya", listOf("7", "V15")))
+            assertEquals(settings, store.get(WIDGET).settings)
+
+            controller.configure(WIDGET, BusStop("1002", "Hospital", listOf("H12")))
+            assertEquals(WidgetSettings(theme = WidgetTheme.TMB), store.get(WIDGET).settings)
+        }
+    }
+
+    @Test
+    fun `updating settings re-renders the widget`() = runTest {
+        controller.configure(WIDGET, stop)
+        renderer.rendered.clear()
+
+        controller.updateSettings(WIDGET, WidgetSettings(favoriteLine = "7"))
+
+        assertEquals("7", store.get(WIDGET).settings.favoriteLine)
         assertEquals(listOf(WIDGET), renderer.rendered)
     }
 

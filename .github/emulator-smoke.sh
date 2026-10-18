@@ -73,7 +73,12 @@ adb shell input text "2903"
 sleep 3
 shot 05-search-results
 tap_text "Stop 2903"
-sleep 6
+sleep 4
+# Choosing a stop opens the widget settings; pick the transparent style to exercise it.
+shot 05b-settings
+tap_text "Transparent"
+tap_text "Done"
+sleep 4
 
 adb shell input keyevent KEYCODE_HOME
 sleep 4

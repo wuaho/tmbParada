@@ -1,6 +1,7 @@
 package com.example.tmbparada.widget.ui
 
 import com.example.tmbparada.domain.model.RefreshError
+import com.example.tmbparada.domain.model.WidgetTheme
 
 /** Render-ready description of a widget, free of Android types so it can be unit tested. */
 sealed interface WidgetUiModel {
@@ -14,14 +15,16 @@ sealed interface WidgetUiModel {
         val status: Status,
         val isRefreshing: Boolean,
         val isStale: Boolean,
+        val theme: WidgetTheme,
     ) : WidgetUiModel
 }
 
-/** One line and destination with its next arrivals, in whole minutes (0 means "now"). */
+/** One line and destination with its next arrivals, in whole minutes (0 means arriving). */
 data class ArrivalRow(
     val line: String,
     val destination: String?,
     val minutes: List<Int>,
+    val isFavorite: Boolean = false,
 )
 
 /** Shown instead of rows when there are no arrivals to list. */

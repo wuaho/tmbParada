@@ -4,7 +4,9 @@ import com.example.tmbparada.domain.model.Arrival
 import com.example.tmbparada.domain.model.ArrivalsSnapshot
 import com.example.tmbparada.domain.model.BusStop
 import com.example.tmbparada.domain.model.RefreshError
+import com.example.tmbparada.domain.model.WidgetSettings
 import com.example.tmbparada.domain.model.WidgetState
+import com.example.tmbparada.domain.model.WidgetTheme
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -44,6 +46,8 @@ private data class StoredWidgetState(
     val liveUntilMillis: Long? = null,
     val refreshStartedAtMillis: Long? = null,
     val lastError: RefreshError? = null,
+    val favoriteLine: String? = null,
+    val theme: WidgetTheme = WidgetTheme.SYSTEM,
 )
 
 @Serializable
@@ -83,6 +87,8 @@ private fun WidgetState.toStored() = StoredWidgetState(
     liveUntilMillis = liveUntilMillis,
     refreshStartedAtMillis = refreshStartedAtMillis,
     lastError = lastError,
+    favoriteLine = settings.favoriteLine,
+    theme = settings.theme,
 )
 
 private fun StoredWidgetState.toDomain() = WidgetState(
@@ -96,4 +102,5 @@ private fun StoredWidgetState.toDomain() = WidgetState(
     liveUntilMillis = liveUntilMillis,
     refreshStartedAtMillis = refreshStartedAtMillis,
     lastError = lastError,
+    settings = WidgetSettings(favoriteLine = favoriteLine, theme = theme),
 )

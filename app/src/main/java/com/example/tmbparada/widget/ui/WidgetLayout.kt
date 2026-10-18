@@ -7,6 +7,8 @@ import kotlin.math.floor
  *
  * - Wide widgets list one line and destination per row.
  * - Square or narrow widgets show a grid of tiles, with as many columns as fit.
+ * - Widgets that fit a single tile column (such as 2x2) show the next bus in large type,
+ *   followed by one compact line per other route if there is room.
  * - Short widgets use a compact single-line header so at least one row always fits whole.
  */
 data class WidgetLayout(
@@ -16,7 +18,7 @@ data class WidgetLayout(
     val rows: Int,
     val listColumns: ListColumns = ListColumns.FULL,
 ) {
-    enum class Mode { LIST, GRID }
+    enum class Mode { LIST, GRID, HERO }
 
     /** What a list row shows besides the badge and the next bus, from widest to narrowest. */
     enum class ListColumns { FULL, NO_DESTINATION, NEXT_ONLY }
@@ -38,6 +40,8 @@ data class WidgetLayout(
         const val TILE_HEIGHT = 56f
         const val TILE_MIN_WIDTH = 120f
         const val TILE_GAP = 6f
+        const val HERO_HEIGHT = 88f
+        const val HERO_EXTRA_ROW_HEIGHT = 20f
 
         /** Widgets at least this tall relative to their width are laid out as a grid. */
         const val GRID_ASPECT_RATIO = 0.75f
@@ -55,6 +59,7 @@ data class WidgetLayout(
         const val MAX_LIST_ROWS = 8
         const val MAX_GRID_ROWS = 4
         const val MAX_GRID_COLUMNS = 3
+        const val MAX_HERO_EXTRA_ROWS = 5
 
         fun forSize(widthDp: Float, heightDp: Float): WidgetLayout {
             val compact = heightDp < PADDING * 2 + HEADER_HEIGHT + HEADER_SPACING + ROW_HEIGHT
@@ -68,6 +73,10 @@ data class WidgetLayout(
             val prefersGrid = heightDp >= widthDp * GRID_ASPECT_RATIO || widthDp < LIST_MIN_WIDTH
             if (prefersGrid && gridRows >= 1) {
                 val columns = fit(contentWidth, TILE_MIN_WIDTH, TILE_GAP).coerceIn(1, MAX_GRID_COLUMNS)
+                if (columns == 1 && contentHeight >= HERO_HEIGHT) {
+                    val extraRows = fit(contentHeight - HERO_HEIGHT, HERO_EXTRA_ROW_HEIGHT, 0f)
+                    return WidgetLayout(Mode.HERO, compact, columns = 1, rows = 1 + extraRows.coerceAtMost(MAX_HERO_EXTRA_ROWS))
+                }
                 return WidgetLayout(Mode.GRID, compact, columns, gridRows)
             }
 

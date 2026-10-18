@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.tmbparada.domain.StopCatalog
 import com.example.tmbparada.domain.WidgetStateStore
 import com.example.tmbparada.domain.model.BusStop
+import com.example.tmbparada.domain.model.WidgetSettings
 import com.example.tmbparada.domain.refresh.LiveRefreshController
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -37,6 +38,11 @@ class StopPickerViewModel(
         .map { it.stop }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), null)
 
+    /** Null until the stored settings are loaded, so the form never starts from defaults. */
+    val settings: StateFlow<WidgetSettings?> = store.observe(widgetId)
+        .map { it.settings }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), null)
+
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     val results: StateFlow<SearchResults> = _query
         .debounce { if (it.isBlank()) 0L else SEARCH_DEBOUNCE_MILLIS }
@@ -55,6 +61,10 @@ class StopPickerViewModel(
 
     suspend fun select(stop: BusStop) {
         liveRefresh.configure(widgetId, stop)
+    }
+
+    suspend fun saveSettings(settings: WidgetSettings) {
+        liveRefresh.updateSettings(widgetId, settings)
     }
 
     private companion object {

@@ -28,7 +28,7 @@ import com.example.tmbparada.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(viewModel: HomeViewModel, onChangeStop: (Int) -> Unit) {
+fun HomeScreen(viewModel: HomeViewModel, onChangeStop: (Int) -> Unit, onCustomize: (Int) -> Unit) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     RequestNotificationPermission()
 
@@ -49,6 +49,7 @@ fun HomeScreen(viewModel: HomeViewModel, onChangeStop: (Int) -> Unit) {
                 state = state,
                 onAddWidget = viewModel::addWidget,
                 onChangeStop = onChangeStop,
+                onCustomize = onCustomize,
             )
             Text(
                 stringResource(R.string.home_how_it_works),
@@ -87,6 +88,7 @@ private fun WidgetsCard(
     state: HomeUiState,
     onAddWidget: () -> Unit,
     onChangeStop: (Int) -> Unit,
+    onCustomize: (Int) -> Unit,
 ) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -95,9 +97,9 @@ private fun WidgetsCard(
                 Text(stringResource(R.string.home_widgets_empty), style = MaterialTheme.typography.bodyMedium)
             }
             state.widgets.forEach { widget ->
+                val stop = widget.stop
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        val stop = widget.stop
                         Text(
                             when {
                                 stop == null -> stringResource(R.string.home_widget_not_configured)
@@ -108,8 +110,15 @@ private fun WidgetsCard(
                         )
                         if (stop != null) LineBadges(stop.lines)
                     }
-                    TextButton(onClick = { onChangeStop(widget.widgetId) }) {
-                        Text(stringResource(R.string.home_change_stop))
+                    Column(horizontalAlignment = Alignment.End) {
+                        TextButton(onClick = { onChangeStop(widget.widgetId) }) {
+                            Text(stringResource(R.string.home_change_stop))
+                        }
+                        if (stop != null) {
+                            TextButton(onClick = { onCustomize(widget.widgetId) }) {
+                                Text(stringResource(R.string.action_customize))
+                            }
+                        }
                     }
                 }
             }

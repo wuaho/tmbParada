@@ -111,9 +111,10 @@ class LiveSessionService : Service() {
 
     private fun postAlerts(widgetId: Int, state: WidgetState, nowMillis: Long) {
         val stop = state.stop ?: return
-        val rows = state.snapshot?.let { WidgetPresenter.groupArrivals(it.arrivals, nowMillis) }.orEmpty()
+        val favoriteLine = state.settings.favoriteLine
+        val rows = state.snapshot?.let { WidgetPresenter.groupArrivals(it.arrivals, nowMillis, favoriteLine) }.orEmpty()
         val alerted = alertedRows.getOrPut(widgetId) { mutableSetOf() }
-        ArrivalAlerts.due(rows, alerted).forEach { row ->
+        ArrivalAlerts.due(rows, alerted, favoriteLine).forEach { row ->
             alerted += ArrivalAlerts.key(row)
             post(widgetId, notifications.alert(widgetId, stop, row), tag = ArrivalAlerts.key(row))
         }
