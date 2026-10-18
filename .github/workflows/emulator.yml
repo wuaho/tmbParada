@@ -2,8 +2,18 @@ name: Emulator smoke test
 
 on:
   workflow_dispatch:
-  push:
-    branches: ["claude/**"]
+  pull_request:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "gradle/**"
+      - "*.gradle.kts"
+      - ".github/emulator-smoke.sh"
+      - ".github/workflows/emulator.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   smoke:
