@@ -37,6 +37,8 @@ for node in re.finditer(r"<node [^>]*>", xml):
   done
   echo "NOT FOUND: $1"
   ui > "$OUT/ui-not-found-$(date +%s).xml"
+  echo "Focused window: $(adb shell dumpsys window | grep -m1 mCurrentFocus)"
+  echo "On screen: $(ui | grep -o -E '(text|content-desc)="[^"]+"' | head -25 | tr '\n' ' ')"
   return 1
 }
 
@@ -45,6 +47,7 @@ adb shell settings put global transition_animation_scale 0
 adb shell settings put global animator_duration_scale 0
 # -g grants runtime permissions, such as notifications, so no dialog covers the screen.
 adb install -r -g app/build/outputs/apk/debug/app-debug.apk
+adb shell pm grant "$PKG" android.permission.POST_NOTIFICATIONS || true
 adb logcat -c
 
 adb shell am start -W -n "$PKG/.MainActivity"
