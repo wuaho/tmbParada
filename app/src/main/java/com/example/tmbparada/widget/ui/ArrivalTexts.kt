@@ -20,22 +20,15 @@ fun Context.rowTimesText(row: ArrivalRow): String = row.minutes.joinToString(" Â
 
 fun Context.statusText(status: Status): String = when (status) {
     Status.Updating -> getString(R.string.widget_status_updating)
-    Status.NeverUpdated -> getString(R.string.widget_status_never)
     is Status.Live -> status.updatedAtMillis
         ?.let { getString(R.string.widget_status_live, timeWithSeconds(it)) }
         ?: getString(R.string.widget_status_live_no_data)
     is Status.Failed -> errorText(status.error)
-    is Status.Updated -> when {
-        status.minutesAgo < 1 -> getString(R.string.widget_status_just_now)
-        status.minutesAgo < 60 -> getString(R.string.widget_status_minutes_ago, status.minutesAgo.toInt())
-        else -> getString(R.string.widget_status_hours_ago, (status.minutesAgo / 60).toInt())
-    }
 }
 
 fun Context.placeholderText(placeholder: Placeholder): String = getString(
     when (placeholder) {
         Placeholder.LOADING -> R.string.widget_placeholder_loading
-        Placeholder.TAP_TO_REFRESH -> R.string.widget_placeholder_tap_to_refresh
         Placeholder.NO_BUSES -> R.string.widget_placeholder_no_buses
         Placeholder.FAILED -> R.string.widget_placeholder_failed
     },

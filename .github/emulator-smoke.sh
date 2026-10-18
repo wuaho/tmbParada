@@ -115,6 +115,21 @@ shot 08c-lock-screen
 adb shell wm dismiss-keyguard
 sleep 2
 
+# Ending the session from the notification turns the widget into its idle "start" view.
+adb shell cmd statusbar expand-notifications
+sleep 2
+tap_text "Stop|STOP"
+adb shell cmd statusbar collapse
+adb shell input keyevent KEYCODE_HOME
+sleep 4
+shot 08d-widget-idle
+if ui | grep -q 'text="See arrivals"'; then
+  echo "Idle widget shown"
+else
+  echo "Idle widget NOT shown"
+  live_failed=1
+fi
+
 adb shell cmd uimode night yes
 sleep 5
 shot 09-widget-dark

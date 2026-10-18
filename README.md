@@ -19,6 +19,8 @@ when the next TMB Barcelona buses reach a stop you choose.
   or transparent (a light veil that lets the wallpaper show through).
 - **Zero cost while idle.** The widget never polls in the background. Tapping ↻ starts
   a ten-minute live session that refreshes every 20 seconds and then stops.
+- **No stale times.** Outside a live session the widget hides arrivals, which would soon
+  be wrong, and shows a large "See arrivals" button that starts a new session.
 - **Live on the lock screen.** During a session an ongoing notification shows the next
   buses, with a clock counting from the last update and Refresh / Stop buttons. On
   Android 16 it asks to be shown as a Live Update (lock screen and status bar chip).

@@ -77,6 +77,12 @@ class LiveSessionService : Service() {
     }
 
     private fun render(states: Map<Int, WidgetState>, nowMillis: Long) {
+        // Sessions past their deadline whose final step never ran (e.g. the process was killed)
+        // are closed here, so their widgets switch to the idle view instead of keeping old times.
+        states.filter { (_, state) -> state.liveUntilMillis != null && !state.isLive(nowMillis) }
+            .keys
+            .forEach { widgetId -> scope.launch { appContainer.liveRefresh.stopLiveSession(widgetId) } }
+
         val live = states.filter { (_, state) -> state.stop != null && state.isLive(nowMillis) }
 
         if (live.isEmpty()) {

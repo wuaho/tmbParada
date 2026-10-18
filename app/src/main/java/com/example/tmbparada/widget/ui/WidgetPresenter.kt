@@ -1,16 +1,14 @@
 package com.example.tmbparada.widget.ui
 
 import com.example.tmbparada.domain.model.Arrival
+import com.example.tmbparada.domain.model.RefreshError
 import com.example.tmbparada.domain.model.WidgetState
 import kotlin.math.ceil
 
 /** Maps stored [WidgetState] to [WidgetUiModel] at a given instant. */
 object WidgetPresenter {
-    /** Arrivals become approximate once the last update is this old. */
+    /** Arrivals become approximate once the last update is this old, e.g. after failures. */
     const val STALE_AFTER_MILLIS = 5 * 60_000L
-
-    /** Arrivals are hidden once the last update is this old; they would only mislead. */
-    const val EXPIRED_AFTER_MILLIS = 60 * 60_000L
 
     /** A request still marked as in flight after this long was interrupted. */
     const val REFRESH_TIMEOUT_MILLIS = 60_000L
@@ -20,34 +18,42 @@ object WidgetPresenter {
 
     const val MAX_ARRIVALS_PER_ROW = 2
 
+    /** Errors still worth showing once the session is over, because only the user can fix them. */
+    private val PERSISTENT_ERRORS = setOf(RefreshError.MISSING_CREDENTIALS, RefreshError.UNAUTHORIZED)
+
     fun present(state: WidgetState, nowMillis: Long): WidgetUiModel {
         val stop = state.stop ?: return WidgetUiModel.NotConfigured
 
-        val snapshot = state.snapshot
-        val ageMillis = snapshot?.let { (nowMillis - it.fetchedAtMillis).coerceAtLeast(0L) }
         val isRefreshing = state.refreshStartedAtMillis
             ?.let { nowMillis - it in 0 until REFRESH_TIMEOUT_MILLIS } == true
-        val usableSnapshot = snapshot?.takeIf { ageMillis != null && ageMillis < EXPIRED_AFTER_MILLIS }
-        val rows = usableSnapshot?.let { groupArrivals(it.arrivals, nowMillis, state.settings.favoriteLine) }.orEmpty()
         val liveUntil = state.liveUntilMillis?.takeIf { it > nowMillis }
+        if (liveUntil == null && !isRefreshing) {
+            return WidgetUiModel.Idle(
+                stopName = stop.name,
+                stopCode = stop.code,
+                error = state.lastError?.takeIf { it in PERSISTENT_ERRORS },
+                theme = state.settings.theme,
+            )
+        }
+
+        val snapshot = state.snapshot
+        val ageMillis = snapshot?.let { (nowMillis - it.fetchedAtMillis).coerceAtLeast(0L) }
+        val rows = snapshot?.let { groupArrivals(it.arrivals, nowMillis, state.settings.favoriteLine) }.orEmpty()
 
         val status = when {
             isRefreshing -> Status.Updating
             state.lastError != null -> Status.Failed(state.lastError)
-            liveUntil != null -> Status.Live(minutesLeft(liveUntil, nowMillis), snapshot?.fetchedAtMillis)
-            ageMillis != null -> Status.Updated(minutesAgo = ageMillis / MILLIS_PER_MINUTE)
-            else -> Status.NeverUpdated
+            else -> Status.Live(minutesLeft(liveUntil ?: nowMillis, nowMillis), snapshot?.fetchedAtMillis)
         }
 
         val placeholder = when {
             rows.isNotEmpty() -> null
-            isRefreshing -> Placeholder.LOADING
-            state.lastError != null -> Placeholder.FAILED
-            usableSnapshot != null -> Placeholder.NO_BUSES
-            else -> Placeholder.TAP_TO_REFRESH
+            state.lastError != null && !isRefreshing -> Placeholder.FAILED
+            snapshot != null && !isRefreshing -> Placeholder.NO_BUSES
+            else -> Placeholder.LOADING
         }
 
-        return WidgetUiModel.Stop(
+        return WidgetUiModel.Active(
             stopName = stop.name,
             stopCode = stop.code,
             rows = rows,
