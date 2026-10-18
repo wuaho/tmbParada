@@ -26,6 +26,7 @@ import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
@@ -43,15 +44,12 @@ import com.example.tmbparada.domain.BusLines
 import com.example.tmbparada.domain.model.RefreshError
 import com.example.tmbparada.widget.RefreshAction
 
-private val ContentPadding = 12.dp
-private val HeaderHeight = 40.dp
-private val HeaderSpacing = 8.dp
-private val RowHeight = 32.dp
-
 @Composable
 fun WidgetContent(widgetId: Int, model: WidgetUiModel) {
     val context = LocalContext.current
     val openStopPicker = actionStartActivity(StopPickerActivity.intent(context, widgetId))
+    val size = LocalSize.current
+    val layout = WidgetLayout.forSize(size.width.value, size.height.value)
 
     Box(
         modifier = GlanceModifier
@@ -59,11 +57,11 @@ fun WidgetContent(widgetId: Int, model: WidgetUiModel) {
             .appWidgetBackground()
             .background(GlanceTheme.colors.widgetBackground)
             .cornerRadius(20.dp)
-            .padding(ContentPadding),
+            .padding(layout.padding.dp),
     ) {
         when (model) {
             WidgetUiModel.NotConfigured -> NotConfiguredContent(openStopPicker)
-            is WidgetUiModel.Stop -> StopContent(model, openStopPicker)
+            is WidgetUiModel.Stop -> StopContent(model, layout, openStopPicker)
         }
     }
 }
@@ -106,13 +104,12 @@ private fun NotConfiguredContent(openStopPicker: Action) {
 }
 
 @Composable
-private fun StopContent(model: WidgetUiModel.Stop, openStopPicker: Action) {
+private fun StopContent(model: WidgetUiModel.Stop, layout: WidgetLayout, openStopPicker: Action) {
     val context = LocalContext.current
-    val visibleRows = rowCapacity(LocalSize.current.height)
 
     Column(modifier = GlanceModifier.fillMaxSize()) {
-        Header(model, openStopPicker)
-        Spacer(GlanceModifier.height(HeaderSpacing))
+        Header(model, layout, openStopPicker)
+        Spacer(GlanceModifier.height(layout.headerSpacing.dp))
         if (model.rows.isEmpty()) {
             Box(
                 modifier = GlanceModifier.fillMaxWidth().defaultWeight(),
@@ -129,23 +126,26 @@ private fun StopContent(model: WidgetUiModel.Stop, openStopPicker: Action) {
                 )
             }
         } else {
-            Column(modifier = GlanceModifier.fillMaxWidth().defaultWeight()) {
-                model.rows.take(visibleRows).forEach { row ->
-                    ArrivalRowContent(row, isStale = model.isStale)
+            val visible = model.rows.take(layout.capacity)
+            when (layout.mode) {
+                WidgetLayout.Mode.LIST -> Column(modifier = GlanceModifier.fillMaxWidth().defaultWeight()) {
+                    visible.forEach { row -> ArrivalListRow(row, isStale = model.isStale) }
                 }
+                WidgetLayout.Mode.GRID -> ArrivalGrid(visible, layout.columns, isStale = model.isStale)
             }
         }
     }
 }
 
 @Composable
-private fun Header(model: WidgetUiModel.Stop, openStopPicker: Action) {
+private fun Header(model: WidgetUiModel.Stop, layout: WidgetLayout, openStopPicker: Action) {
     val context = LocalContext.current
     val stopLabel = context.getString(R.string.widget_stop_code, model.stopCode)
     val statusLabel = context.statusText(model.status)
+    val headerHeight = layout.headerHeight.dp
 
     Row(
-        modifier = GlanceModifier.fillMaxWidth().height(HeaderHeight),
+        modifier = GlanceModifier.fillMaxWidth().height(headerHeight),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = GlanceModifier.defaultWeight().clickable(openStopPicker)) {
@@ -153,83 +153,70 @@ private fun Header(model: WidgetUiModel.Stop, openStopPicker: Action) {
                 text = model.stopName ?: stopLabel,
                 style = TextStyle(
                     color = GlanceTheme.colors.onSurface,
-                    fontSize = 15.sp,
+                    fontSize = if (layout.compactHeader) 14.sp else 15.sp,
                     fontWeight = FontWeight.Bold,
                 ),
                 maxLines = 1,
             )
-            Text(
-                text = if (model.stopName != null) "$stopLabel · $statusLabel" else statusLabel,
-                style = TextStyle(
-                    color = if (model.status is Status.Failed) {
-                        GlanceTheme.colors.error
-                    } else {
-                        GlanceTheme.colors.onSurfaceVariant
-                    },
-                    fontSize = 11.sp,
-                ),
-                maxLines = 1,
-            )
+            // Short widgets drop the status line; the refresh button still shows progress.
+            if (!layout.compactHeader) {
+                Text(
+                    text = if (model.stopName != null) "$stopLabel · $statusLabel" else statusLabel,
+                    style = TextStyle(
+                        color = if (model.status is Status.Failed) {
+                            GlanceTheme.colors.error
+                        } else {
+                            GlanceTheme.colors.onSurfaceVariant
+                        },
+                        fontSize = 11.sp,
+                    ),
+                    maxLines = 1,
+                )
+            }
         }
         Spacer(GlanceModifier.width(8.dp))
-        RefreshButton(isRefreshing = model.isRefreshing)
+        RefreshButton(isRefreshing = model.isRefreshing, size = headerHeight)
     }
 }
 
 @Composable
-private fun RefreshButton(isRefreshing: Boolean) {
+private fun RefreshButton(isRefreshing: Boolean, size: Dp) {
     val context = LocalContext.current
+    val iconSize = size / 2
     Box(
         modifier = GlanceModifier
-            .size(HeaderHeight)
-            .cornerRadius(HeaderHeight / 2)
+            .size(size)
+            .cornerRadius(size / 2)
             .background(GlanceTheme.colors.secondaryContainer)
             .clickable(actionRunCallback<RefreshAction>()),
         contentAlignment = Alignment.Center,
     ) {
         if (isRefreshing) {
             CircularProgressIndicator(
-                modifier = GlanceModifier.size(20.dp),
+                modifier = GlanceModifier.size(iconSize),
                 color = GlanceTheme.colors.onSecondaryContainer,
             )
         } else {
             Image(
                 provider = ImageProvider(R.drawable.ic_refresh),
                 contentDescription = context.getString(R.string.widget_refresh),
-                modifier = GlanceModifier.size(20.dp),
+                modifier = GlanceModifier.size(iconSize),
                 colorFilter = ColorFilter.tint(GlanceTheme.colors.onSecondaryContainer),
             )
         }
     }
 }
 
+/** Line badge, destination, then the following bus (dimmed) and the next bus, in fixed columns. */
 @Composable
-private fun ArrivalRowContent(row: ArrivalRow, isStale: Boolean) {
+private fun ArrivalListRow(row: ArrivalRow, isStale: Boolean) {
     val context = LocalContext.current
-    val timeColor = if (isStale) GlanceTheme.colors.onSurfaceVariant else GlanceTheme.colors.primary
 
     Row(
-        modifier = GlanceModifier.fillMaxWidth().height(RowHeight),
+        modifier = GlanceModifier.fillMaxWidth().height(WidgetLayout.ROW_HEIGHT.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(
-            modifier = GlanceModifier
-                .width(44.dp)
-                .height(24.dp)
-                .cornerRadius(6.dp)
-                .background(ColorProvider(Color(BusLines.colorFor(row.line)))),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = row.line,
-                style = TextStyle(
-                    color = ColorProvider(Color.White),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                ),
-                maxLines = 1,
-            )
-        }
+        LineBadge(row.line, width = 44.dp, height = 24.dp, fontSize = 12)
         Spacer(GlanceModifier.width(8.dp))
         Text(
             text = row.destination ?: context.getString(R.string.widget_destination_unknown),
@@ -237,26 +224,114 @@ private fun ArrivalRowContent(row: ArrivalRow, isStale: Boolean) {
             style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 13.sp),
             maxLines = 1,
         )
-        Spacer(GlanceModifier.width(6.dp))
         Text(
-            text = context.minutesText(row.minutes.first(), approximate = isStale),
-            style = TextStyle(color = timeColor, fontSize = 15.sp, fontWeight = FontWeight.Bold),
+            text = row.minutes.getOrNull(1)?.let { context.minutesText(it, approximate = isStale) }.orEmpty(),
+            modifier = GlanceModifier.width(52.dp),
+            style = followingTimeStyle(TextAlign.End),
             maxLines = 1,
         )
-        row.minutes.getOrNull(1)?.let { following ->
-            Text(
-                text = " · " + context.minutesText(following, approximate = isStale),
-                style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 12.sp),
-                maxLines = 1,
-            )
+        Text(
+            text = context.minutesText(row.minutes.first(), approximate = isStale),
+            modifier = GlanceModifier.width(64.dp),
+            style = nextTimeStyle(isStale, fontSize = 15, textAlign = TextAlign.End),
+            maxLines = 1,
+        )
+    }
+}
+
+@Composable
+private fun ArrivalGrid(rows: List<ArrivalRow>, columns: Int, isStale: Boolean) {
+    val gap = WidgetLayout.TILE_GAP.dp
+    Column(modifier = GlanceModifier.fillMaxWidth()) {
+        rows.chunked(columns).forEachIndexed { index, line ->
+            if (index > 0) Spacer(GlanceModifier.height(gap))
+            Row(modifier = GlanceModifier.fillMaxWidth().height(WidgetLayout.TILE_HEIGHT.dp)) {
+                repeat(columns) { column ->
+                    if (column > 0) Spacer(GlanceModifier.width(gap))
+                    val tileModifier = GlanceModifier.defaultWeight().fillMaxHeight()
+                    val row = line.getOrNull(column)
+                    if (row != null) ArrivalTile(row, isStale, tileModifier) else Box(tileModifier) {}
+                }
+            }
         }
     }
 }
 
-private fun rowCapacity(widgetHeight: Dp): Int {
-    val available = widgetHeight - ContentPadding * 2 - HeaderHeight - HeaderSpacing
-    return (available.value / RowHeight.value).toInt().coerceAtLeast(1)
+/** Grid cell: badge and destination on top, next bus large with the following one dimmed. */
+@Composable
+private fun ArrivalTile(row: ArrivalRow, isStale: Boolean, modifier: GlanceModifier) {
+    val context = LocalContext.current
+    Column(
+        modifier = modifier
+            .cornerRadius(14.dp)
+            .background(GlanceTheme.colors.secondaryContainer)
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            LineBadge(row.line, width = 36.dp, height = 18.dp, fontSize = 11)
+            Spacer(GlanceModifier.width(6.dp))
+            Text(
+                text = row.destination ?: context.getString(R.string.widget_destination_unknown),
+                style = TextStyle(color = GlanceTheme.colors.onSecondaryContainer, fontSize = 11.sp),
+                maxLines = 1,
+            )
+        }
+        Spacer(GlanceModifier.height(2.dp))
+        Row(verticalAlignment = Alignment.Bottom) {
+            Text(
+                text = context.minutesText(row.minutes.first(), approximate = isStale),
+                style = nextTimeStyle(isStale, fontSize = 18, textAlign = TextAlign.Start),
+                maxLines = 1,
+            )
+            row.minutes.getOrNull(1)?.let { following ->
+                Spacer(GlanceModifier.width(8.dp))
+                Text(
+                    text = context.minutesText(following, approximate = isStale),
+                    style = followingTimeStyle(TextAlign.Start),
+                    maxLines = 1,
+                )
+            }
+        }
+    }
 }
+
+@Composable
+private fun LineBadge(line: String, width: Dp, height: Dp, fontSize: Int) {
+    Box(
+        modifier = GlanceModifier
+            .width(width)
+            .height(height)
+            .cornerRadius(6.dp)
+            .background(ColorProvider(Color(BusLines.colorFor(line)))),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = line,
+            style = TextStyle(
+                color = ColorProvider(Color.White),
+                fontSize = fontSize.sp,
+                fontWeight = FontWeight.Bold,
+            ),
+            maxLines = 1,
+        )
+    }
+}
+
+@Composable
+private fun nextTimeStyle(isStale: Boolean, fontSize: Int, textAlign: TextAlign) = TextStyle(
+    color = if (isStale) GlanceTheme.colors.onSurfaceVariant else GlanceTheme.colors.primary,
+    fontSize = fontSize.sp,
+    fontWeight = FontWeight.Bold,
+    textAlign = textAlign,
+)
+
+@Composable
+private fun followingTimeStyle(textAlign: TextAlign) = TextStyle(
+    color = GlanceTheme.colors.onSurfaceVariant,
+    fontSize = 12.sp,
+    textAlign = textAlign,
+)
 
 private fun Context.minutesText(minutes: Int, approximate: Boolean): String {
     val text = if (minutes == 0) getString(R.string.widget_now) else getString(R.string.widget_minutes, minutes)

@@ -23,13 +23,13 @@ class TmbArrivalsRepository(
 
         return withContext(ioDispatcher) {
             try {
-                val body = apiClient.fetchStopArrivals(stopCode)
+                val parsed = fetchWithFallback(stopCode)
                 val receivedAt = clock.nowMillis()
-                val arrivals = TmbResponseParser.parse(body).map { parsed ->
+                val arrivals = parsed.map {
                     Arrival(
-                        line = parsed.line,
-                        destination = parsed.destination,
-                        arrivalAtMillis = receivedAt + parsed.secondsUntilArrival * 1_000L,
+                        line = it.line,
+                        destination = it.destination,
+                        arrivalAtMillis = receivedAt + it.secondsUntilArrival * 1_000L,
                     )
                 }
                 ArrivalsResult.Success(arrivals)
@@ -44,4 +44,19 @@ class TmbArrivalsRepository(
             }
         }
     }
+
+    /**
+     * iTransit lists several buses per line; iBus only the first one. iBus is kept as a
+     * fallback in case iTransit is unavailable or changes shape. Credential errors are not
+     * retried, since iBus would reject them too.
+     */
+    private fun fetchWithFallback(stopCode: String): List<ParsedArrival> =
+        try {
+            TmbITransitParser.parse(apiClient.fetchITransit(stopCode))
+        } catch (error: TmbHttpException) {
+            if (error.code == 401 || error.code == 403) throw error
+            TmbResponseParser.parse(apiClient.fetchIBus(stopCode))
+        } catch (error: SerializationException) {
+            TmbResponseParser.parse(apiClient.fetchIBus(stopCode))
+        }
 }
