@@ -16,8 +16,9 @@ data class ParsedArrival(
 )
 
 /**
- * Extracts arrivals from iBus responses. The payload shape differs slightly between API
- * versions, so any object carrying a line and a remaining time is accepted, at any depth.
+ * Extracts arrivals from iBus responses, which carry only the first bus of each line. The
+ * payload shape differs slightly between API versions, so any object carrying a line and a
+ * remaining time is accepted, at any depth.
  */
 object TmbResponseParser {
     private val json = Json { ignoreUnknownKeys = true }

@@ -8,9 +8,12 @@ when the next TMB Barcelona buses reach a stop you choose.
 - **One stop per widget.** Search the offline catalog of TMB stops by name, code, or
   line when you add the widget. Tap the stop name on the widget (or use the app) to
   change it later.
-- **Arrivals grouped by line and destination**, with the next two buses per row and
-  line badges in the TMB network colors (H blue, V green, D purple, others red). The
-  number of rows adapts to the widget size.
+- **Arrivals grouped by line and destination**, with the next bus highlighted and the
+  following one dimmed beside it, and line badges in the TMB network colors (H blue,
+  V green, D purple, others red).
+- **Adapts to its size.** Wide widgets show a list, square or narrow ones a grid of
+  tiles, and short ones a compact header so the first row is always complete
+  (`WidgetLayout`).
 - **Zero cost while idle.** The widget never polls in the background. Tapping ↻ starts
   a ten-minute live session that refreshes every 30 seconds and then stops.
 - **Honest times.** Arrivals are stored as absolute timestamps, so the countdown is
@@ -36,11 +39,14 @@ when the next TMB Barcelona buses reach a stop you choose.
    which is convenient for CI.
 3. Never commit `local.properties`. The values are compiled into `BuildConfig`.
 
-Live arrivals come from:
+Live arrivals come from iTransit, which lists the next buses of every line:
 
 ```text
-GET https://api.tmb.cat/v1/ibus/stops/{stop_code}?app_id={app_id}&app_key={app_key}
+GET https://api.tmb.cat/v1/itransit/bus/parades/{stop_code}?app_id={app_id}&app_key={app_key}
 ```
+
+If iTransit fails or changes shape, the app falls back to iBus
+(`/v1/ibus/stops/{stop_code}`), which only reports the first bus of each line.
 
 ## Build and install
 
