@@ -4,4 +4,10 @@
     <color name="widget_loading_text">#1A1B20</color>
     <!-- Red of the TMB network, for the launcher icon. -->
     <color name="tmb_red">#E2001A</color>
+    <!-- Widget picker preview (layout/widget_preview.xml). -->
+    <color name="preview_background">#FFFFFF</color>
+    <color name="preview_text">#1A1A1A</color>
+    <color name="preview_secondary">#5F5F5F</color>
+    <color name="preview_accent">#E2001A</color>
+    <color name="preview_chip">#FDE8EA</color>
 </resources>

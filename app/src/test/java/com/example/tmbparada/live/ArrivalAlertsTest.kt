@@ -16,6 +16,11 @@ class ArrivalAlertsTest {
     }
 
     @Test
+    fun `with a favorite line only that line alerts`() {
+        assertEquals(listOf(h16), ArrivalAlerts.due(listOf(v29, h16), emptySet(), favoriteLine = "H16"))
+    }
+
+    @Test
     fun `alerts each line and destination only once per session`() {
         val alerted = setOf(ArrivalAlerts.key(v29))
 

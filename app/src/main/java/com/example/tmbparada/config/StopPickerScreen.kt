@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,6 +47,7 @@ import com.example.tmbparada.ui.RequestNotificationPermission
 fun StopPickerScreen(
     viewModel: StopPickerViewModel,
     onStopSelected: (BusStop) -> Unit,
+    onCustomize: () -> Unit,
     onClose: () -> Unit,
 ) {
     val query by viewModel.query.collectAsStateWithLifecycle()
@@ -98,7 +100,7 @@ fun StopPickerScreen(
             )
 
             when (val state = results) {
-                SearchResults.Idle -> IdleContent(currentStop)
+                SearchResults.Idle -> IdleContent(currentStop, onCustomize)
                 is SearchResults.Loaded -> if (state.stops.isEmpty()) {
                     Hint(stringResource(R.string.picker_no_results))
                 } else {
@@ -115,7 +117,7 @@ fun StopPickerScreen(
 }
 
 @Composable
-private fun IdleContent(currentStop: BusStop?) {
+private fun IdleContent(currentStop: BusStop?, onCustomize: () -> Unit) {
     Column(
         modifier = Modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -137,6 +139,9 @@ private fun IdleContent(currentStop: BusStop?) {
                     style = MaterialTheme.typography.bodyLarge,
                 )
                 LineBadges(currentStop.lines)
+                TextButton(onClick = onCustomize, contentPadding = PaddingValues(0.dp)) {
+                    Text(stringResource(R.string.action_customize))
+                }
             }
         }
     }

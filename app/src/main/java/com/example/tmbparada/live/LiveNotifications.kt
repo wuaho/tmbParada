@@ -65,7 +65,7 @@ class LiveNotifications(private val context: Context) {
         val stop = state.stop
         val title = stop?.name ?: stop?.let { context.getString(R.string.widget_stop_code, it.code) }
         val snapshot = state.snapshot
-        val rows = snapshot?.let { WidgetPresenter.groupArrivals(it.arrivals, nowMillis) }.orEmpty()
+        val rows = snapshot?.let { WidgetPresenter.groupArrivals(it.arrivals, nowMillis, state.settings.favoriteLine) }.orEmpty()
             .take(MAX_ROWS)
 
         val summary = when {

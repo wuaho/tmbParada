@@ -1,4 +1,9 @@
 <resources>
     <color name="widget_loading_background">#121318</color>
     <color name="widget_loading_text">#E4E1E9</color>
+    <color name="preview_background">#161616</color>
+    <color name="preview_text">#F2F2F2</color>
+    <color name="preview_secondary">#B8B8B8</color>
+    <color name="preview_accent">#FF6B74</color>
+    <color name="preview_chip">#3B1C1F</color>
 </resources>

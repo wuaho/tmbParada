@@ -5,7 +5,7 @@
     <string name="widget_choose_stop_body">Toca para elegir la parada de este widget</string>
     <string name="widget_stop_code">Parada %1$s</string>
     <string name="widget_refresh">Actualizar llegadas</string>
-    <string name="widget_now">ya</string>
+    <string name="widget_now">Llegando</string>
     <string name="widget_minutes">%1$d min</string>
     <string name="widget_destination_unknown">Próximo bus</string>
     <string name="widget_status_updating">Actualizando…</string>
@@ -55,4 +55,21 @@
     <string name="live_action_refresh">Actualizar</string>
     <string name="live_action_stop">Parar</string>
     <string name="alert_title">El %1$s llega en %2$s</string>
+
+    <!-- Widget settings -->
+    <string name="widget_then">luego %1$s</string>
+    <string name="preview_status">Parada 2903 · En directo · 11:33:20</string>
+    <string name="settings_title">Personalizar widget</string>
+    <string name="settings_favorite_title">Línea favorita</string>
+    <string name="settings_favorite_body">Aparece primero, en grande en los widgets pequeños, y es la única que te avisa.</string>
+    <string name="settings_favorite_none">Ninguna</string>
+    <string name="settings_theme_title">Estilo</string>
+    <string name="settings_theme_system">Colores del sistema</string>
+    <string name="settings_theme_system_body">Se adapta a tu fondo de pantalla</string>
+    <string name="settings_theme_tmb">TMB</string>
+    <string name="settings_theme_tmb_body">Blanco y rojo TMB</string>
+    <string name="settings_theme_transparent">Transparente</string>
+    <string name="settings_theme_transparent_body">Deja ver tu fondo de pantalla</string>
+    <string name="settings_done">Listo</string>
+    <string name="action_customize">Personalizar</string>
 </resources>

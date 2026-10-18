@@ -11,9 +11,12 @@ when the next TMB Barcelona buses reach a stop you choose.
 - **Arrivals grouped by line and destination**, with the next bus highlighted and the
   following one dimmed beside it, and line badges in the TMB network colors (H blue,
   V green, D purple, others red).
-- **Adapts to its size.** Wide widgets show a list, square or narrow ones a grid of
-  tiles, and short ones a compact header so the first row is always complete
-  (`WidgetLayout`).
+- **Adapts to its size.** Wide widgets show a list, square ones a grid of tiles, small
+  square ones (2×2) the next bus in large type, and short ones a compact header so the
+  first row is always complete (`WidgetLayout`).
+- **Per-widget settings.** A favorite line (listed first, shown in the large view, and the
+  only line that alerts) and a style: system colors (Material You), TMB (white and red),
+  or transparent (a light veil that lets the wallpaper show through).
 - **Zero cost while idle.** The widget never polls in the background. Tapping ↻ starts
   a ten-minute live session that refreshes every 20 seconds and then stops.
 - **Live on the lock screen.** During a session an ongoing notification shows the next

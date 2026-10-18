@@ -34,6 +34,9 @@ class MainActivity : ComponentActivity() {
                 HomeScreen(
                     viewModel = viewModel,
                     onChangeStop = { widgetId -> startActivity(StopPickerActivity.intent(this, widgetId)) },
+                    onCustomize = { widgetId ->
+                        startActivity(StopPickerActivity.intent(this, widgetId, customize = true))
+                    },
                 )
             }
         }

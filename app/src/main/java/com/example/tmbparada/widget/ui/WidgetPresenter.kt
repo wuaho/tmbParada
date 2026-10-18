@@ -28,7 +28,7 @@ object WidgetPresenter {
         val isRefreshing = state.refreshStartedAtMillis
             ?.let { nowMillis - it in 0 until REFRESH_TIMEOUT_MILLIS } == true
         val usableSnapshot = snapshot?.takeIf { ageMillis != null && ageMillis < EXPIRED_AFTER_MILLIS }
-        val rows = usableSnapshot?.let { groupArrivals(it.arrivals, nowMillis) }.orEmpty()
+        val rows = usableSnapshot?.let { groupArrivals(it.arrivals, nowMillis, state.settings.favoriteLine) }.orEmpty()
         val liveUntil = state.liveUntilMillis?.takeIf { it > nowMillis }
 
         val status = when {
@@ -55,11 +55,15 @@ object WidgetPresenter {
             status = status,
             isRefreshing = isRefreshing,
             isStale = ageMillis != null && ageMillis >= STALE_AFTER_MILLIS,
+            theme = state.settings.theme,
         )
     }
 
-    /** Groups arrivals by line and destination, ordered by the next bus of each group. */
-    fun groupArrivals(arrivals: List<Arrival>, nowMillis: Long): List<ArrivalRow> =
+    /**
+     * Groups arrivals by line and destination, ordered by the next bus of each group, with the
+     * [favoriteLine] first.
+     */
+    fun groupArrivals(arrivals: List<Arrival>, nowMillis: Long, favoriteLine: String? = null): List<ArrivalRow> =
         arrivals
             .filter { it.arrivalAtMillis >= nowMillis - DEPARTED_GRACE_MILLIS }
             .sortedBy(Arrival::arrivalAtMillis)
@@ -69,8 +73,10 @@ object WidgetPresenter {
                     line = key.first,
                     destination = key.second,
                     minutes = group.take(MAX_ARRIVALS_PER_ROW).map { minutesUntil(it.arrivalAtMillis, nowMillis) },
+                    isFavorite = key.first == favoriteLine,
                 )
             }
+            .sortedByDescending(ArrivalRow::isFavorite)
 
     /** Rounds down, so riders are never told they have more time than they do. */
     private fun minutesUntil(arrivalAtMillis: Long, nowMillis: Long): Int =

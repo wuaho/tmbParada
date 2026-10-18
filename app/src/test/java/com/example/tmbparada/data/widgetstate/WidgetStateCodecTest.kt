@@ -4,7 +4,9 @@ import com.example.tmbparada.domain.model.Arrival
 import com.example.tmbparada.domain.model.ArrivalsSnapshot
 import com.example.tmbparada.domain.model.BusStop
 import com.example.tmbparada.domain.model.RefreshError
+import com.example.tmbparada.domain.model.WidgetSettings
 import com.example.tmbparada.domain.model.WidgetState
+import com.example.tmbparada.domain.model.WidgetTheme
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -17,6 +19,7 @@ class WidgetStateCodecTest {
             liveUntilMillis = 600_000L,
             refreshStartedAtMillis = 20_000L,
             lastError = RefreshError.NETWORK,
+            settings = WidgetSettings(favoriteLine = "H16", theme = WidgetTheme.TRANSPARENT),
         )
 
         assertEquals(state, WidgetStateCodec.decode(WidgetStateCodec.encode(state)))

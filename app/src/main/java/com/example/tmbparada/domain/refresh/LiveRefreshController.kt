@@ -4,6 +4,7 @@ import com.example.tmbparada.domain.ArrivalsRepository
 import com.example.tmbparada.domain.Clock
 import com.example.tmbparada.domain.WidgetStateStore
 import com.example.tmbparada.domain.model.BusStop
+import com.example.tmbparada.domain.model.WidgetSettings
 import com.example.tmbparada.domain.model.WidgetState
 
 /** Coordinates configuration, live refresh sessions, and cleanup for widget instances. */
@@ -15,10 +16,18 @@ class LiveRefreshController(
     private val policy: LiveRefreshPolicy = LiveRefreshPolicy(),
     private val clock: Clock = Clock.System,
 ) {
-    /** Assigns [stop] to a widget, discarding data from any previous stop, and loads arrivals. */
+    /**
+     * Assigns [stop] to a widget, discarding data from any previous stop, and loads arrivals.
+     * Display settings are kept; a favorite line the new stop does not serve is dropped.
+     */
     suspend fun configure(widgetId: Int, stop: BusStop) {
-        store.update(widgetId) { WidgetState(stop = stop) }
+        store.update(widgetId) { WidgetState(stop = stop, settings = it.settings.forStop(stop)) }
         startLiveSession(widgetId)
+    }
+
+    suspend fun updateSettings(widgetId: Int, settings: WidgetSettings) {
+        store.update(widgetId) { it.copy(settings = settings) }
+        renderer.render(widgetId)
     }
 
     /** Opens (or extends) a live session and refreshes immediately. */
