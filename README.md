@@ -67,8 +67,8 @@ it install and update the APK.
 
 The workflow needs these repository secrets (Settings → Secrets and variables →
 Actions): `TMB_APP_ID`, `TMB_APP_KEY`, `RELEASE_KEYSTORE_BASE64` (the keystore,
-base64-encoded on one line), `RELEASE_KEYSTORE_PASSWORD`, `RELEASE_KEY_ALIAS`, and
-`RELEASE_KEY_PASSWORD`. Every release must be signed with the same keystore, or
+base64-encoded on one line), and `RELEASE_KEYSTORE_PASSWORD`. The key inside the
+keystore must use the alias `tmbstop` and the same password. Every release must be signed with the same keystore, or
 Android refuses to update the installed app; keep a private backup of it.
 
 The credentials are compiled into the published APK, so anyone who downloads it can

@@ -49,8 +49,8 @@ android {
             create("release") {
                 storeFile = releaseKeystore
                 storePassword = System.getenv("RELEASE_KEYSTORE_PASSWORD")
-                keyAlias = System.getenv("RELEASE_KEY_ALIAS")
-                keyPassword = System.getenv("RELEASE_KEY_PASSWORD")
+                keyAlias = "tmbstop"
+                keyPassword = System.getenv("RELEASE_KEYSTORE_PASSWORD")
             }
         }
     }
