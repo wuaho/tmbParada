@@ -82,20 +82,15 @@ shot 05b-settings
 tap_text "Transparent"
 tap_text "Done"
 sleep 4
-echo "After Done: $(adb shell dumpsys window | grep -m1 mCurrentFocus)"
-echo "Bound widgets: $(adb shell dumpsys appwidget | grep -c "$PKG")"
-adb shell dumpsys appwidget | grep -B2 -A6 "$PKG/" | head -40
-echo "Page texts: $(ui | grep -o -E '(text|content-desc)="[^"]+"' | head -30 | tr '\n' ' ')"
-for page in 1 2; do
-  adb shell input swipe 900 1300 150 1300 300
-  sleep 2
-  echo "Next page $page texts: $(ui | grep -o -E '(text|content-desc)="[^"]+"' | head -30 | tr '\n' ' ')"
-done
-adb shell input keyevent KEYCODE_HOME
-sleep 2
-
-adb shell input keyevent KEYCODE_HOME
-sleep 4
+# Done returns to the home screen, on the page where the launcher placed the widget.
+# Pressing Home again would jump to the launcher's default page, so the test does not.
+if ui | grep -q 'content-desc="Refresh arrivals"'; then
+  echo "Returned to the home screen showing the widget"
+else
+  echo "Widget NOT visible after returning home"
+  echo "Focused window: $(adb shell dumpsys window | grep -m1 mCurrentFocus)"
+  live_failed=1
+fi
 shot 06-widget
 
 tap_text "Refresh arrivals"
@@ -134,7 +129,6 @@ adb shell cmd statusbar expand-notifications
 sleep 2
 tap_text "Stop|STOP"
 adb shell cmd statusbar collapse
-adb shell input keyevent KEYCODE_HOME
 sleep 4
 shot 08d-widget-idle
 if ui | grep -q 'text="See arrivals"'; then
