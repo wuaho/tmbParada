@@ -61,8 +61,11 @@ tap_text "Add to home screen|ADD TO HOME SCREEN|Add automatically|ADD AUTOMATICA
 sleep 4
 shot 03-after-pin
 
-# The launcher opens the stop picker; if it does not, open it from the widget.
-if ! ui | grep -q "Choose a bus stop"; then
+# After pinning, the app opens the stop picker; if it does not, open it from the widget.
+if ui | grep -q "Choose a bus stop"; then
+  echo "Stop picker opened after pinning"
+else
+  echo "Stop picker NOT opened after pinning; opening it from the widget"
   adb shell input keyevent KEYCODE_HOME
   sleep 2
   tap_text "Choose a stop"
@@ -79,9 +82,15 @@ shot 05b-settings
 tap_text "Transparent"
 tap_text "Done"
 sleep 4
-
-adb shell input keyevent KEYCODE_HOME
-sleep 4
+# Done returns to the home screen, on the page where the launcher placed the widget.
+# Pressing Home again would jump to the launcher's default page, so the test does not.
+if ui | grep -q 'content-desc="Refresh arrivals"'; then
+  echo "Returned to the home screen showing the widget"
+else
+  echo "Widget NOT visible after returning home"
+  echo "Focused window: $(adb shell dumpsys window | grep -m1 mCurrentFocus)"
+  live_failed=1
+fi
 shot 06-widget
 
 tap_text "Refresh arrivals"
@@ -120,7 +129,6 @@ adb shell cmd statusbar expand-notifications
 sleep 2
 tap_text "Stop|STOP"
 adb shell cmd statusbar collapse
-adb shell input keyevent KEYCODE_HOME
 sleep 4
 shot 08d-widget-idle
 if ui | grep -q 'text="See arrivals"'; then
