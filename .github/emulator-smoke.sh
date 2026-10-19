@@ -83,6 +83,16 @@ tap_text "Transparent"
 tap_text "Done"
 sleep 4
 echo "After Done: $(adb shell dumpsys window | grep -m1 mCurrentFocus)"
+echo "Bound widgets: $(adb shell dumpsys appwidget | grep -c "$PKG")"
+adb shell dumpsys appwidget | grep -B2 -A6 "$PKG/" | head -40
+echo "Page texts: $(ui | grep -o -E '(text|content-desc)="[^"]+"' | head -30 | tr '\n' ' ')"
+for page in 1 2; do
+  adb shell input swipe 900 1300 150 1300 300
+  sleep 2
+  echo "Next page $page texts: $(ui | grep -o -E '(text|content-desc)="[^"]+"' | head -30 | tr '\n' ' ')"
+done
+adb shell input keyevent KEYCODE_HOME
+sleep 2
 
 adb shell input keyevent KEYCODE_HOME
 sleep 4
