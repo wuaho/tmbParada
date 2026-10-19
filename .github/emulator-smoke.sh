@@ -61,8 +61,11 @@ tap_text "Add to home screen|ADD TO HOME SCREEN|Add automatically|ADD AUTOMATICA
 sleep 4
 shot 03-after-pin
 
-# The launcher opens the stop picker; if it does not, open it from the widget.
-if ! ui | grep -q "Choose a bus stop"; then
+# After pinning, the app opens the stop picker; if it does not, open it from the widget.
+if ui | grep -q "Choose a bus stop"; then
+  echo "Stop picker opened after pinning"
+else
+  echo "Stop picker NOT opened after pinning; opening it from the widget"
   adb shell input keyevent KEYCODE_HOME
   sleep 2
   tap_text "Choose a stop"
@@ -79,6 +82,7 @@ shot 05b-settings
 tap_text "Transparent"
 tap_text "Done"
 sleep 4
+echo "After Done: $(adb shell dumpsys window | grep -m1 mCurrentFocus)"
 
 adb shell input keyevent KEYCODE_HOME
 sleep 4
