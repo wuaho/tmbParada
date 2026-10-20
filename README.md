@@ -14,17 +14,22 @@ when the next TMB Barcelona buses reach a stop you choose.
 - **Adapts to its size.** Wide widgets show a list, square ones a grid of tiles, small
   square ones (2×2) the next bus in large type, and short ones a compact header so the
   first row is always complete (`WidgetLayout`).
-- **Per-widget settings.** A favorite line (listed first, shown in the large view, and the
-  only line that alerts) and a style: system colors (Material You), TMB (white and red),
+- **Per-widget settings.** Favorite lines (listed first, the first one in the large view,
+  and the only lines that alert; with none, every line is listed by arrival time), the
+  alert time, and a style: system colors (Material You), TMB (white and red),
   or transparent (a light veil that lets the wallpaper show through).
 - **Zero cost while idle.** The widget never polls in the background. Tapping ↻ starts
   a ten-minute live session that refreshes every 20 seconds and then stops.
+- **Language.** Spanish, Catalan, or English for the app and its widgets, chosen in the
+  app (Android 13+) or in the system's per-app language settings.
 - **No stale times.** Outside a live session the widget hides arrivals, which would soon
   be wrong, and shows a large "See arrivals" button that starts a new session.
 - **Live on the lock screen.** During a session an ongoing notification shows the next
   buses, with a clock counting from the last update and Refresh / Stop buttons. On
   Android 16 it asks to be shown as a Live Update (lock screen and status bar chip).
-- **Time to go.** One alert per line when its next bus is three minutes away.
+- **Time to go.** One alert per line when its next bus crosses the alert time chosen for
+  the widget (3 minutes by default, or off). Buses already that close when the session
+  starts do not alert, since they are on screen.
 - **Honest times.** Arrivals are stored as absolute timestamps, so the countdown is
   recomputed on every render, rounded down. Data older than five minutes is shown as
   approximate (`~3 min`) and data older than an hour is hidden.

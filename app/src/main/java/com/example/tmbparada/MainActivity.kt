@@ -20,6 +20,8 @@ class MainActivity : ComponentActivity() {
                 HomeViewModel(
                     store = container.widgetStateStore,
                     installedWidgets = container.installedWidgets,
+                    liveRefresh = container.liveRefresh,
+                    clock = container.clock,
                     credentialsConfigured = container.credentials.isConfigured,
                 )
             }

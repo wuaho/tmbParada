@@ -17,12 +17,13 @@ class LiveRefreshController(
     private val clock: Clock = Clock.System,
 ) {
     /**
-     * Assigns [stop] to a widget, discarding data from any previous stop, and loads arrivals.
-     * Display settings are kept; a favorite line the new stop does not serve is dropped.
+     * Assigns [stop] to a widget, discarding data from any previous stop. Display settings are
+     * kept; favorites the new stop does not serve are dropped. No live session starts: the
+     * widget waits, idle, until the rider asks for arrivals.
      */
     suspend fun configure(widgetId: Int, stop: BusStop) {
         store.update(widgetId) { WidgetState(stop = stop, settings = it.settings.forStop(stop)) }
-        startLiveSession(widgetId)
+        renderer.render(widgetId)
     }
 
     suspend fun updateSettings(widgetId: Int, settings: WidgetSettings) {

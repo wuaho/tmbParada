@@ -46,8 +46,11 @@ private data class StoredWidgetState(
     val liveUntilMillis: Long? = null,
     val refreshStartedAtMillis: Long? = null,
     val lastError: RefreshError? = null,
+    /** Single favorite written by version 2.0.5; read for migration only. */
     val favoriteLine: String? = null,
+    val favoriteLines: List<String> = emptyList(),
     val theme: WidgetTheme = WidgetTheme.SYSTEM,
+    val alertMinutes: Int? = WidgetSettings.DEFAULT_ALERT_MINUTES,
 )
 
 @Serializable
@@ -87,8 +90,9 @@ private fun WidgetState.toStored() = StoredWidgetState(
     liveUntilMillis = liveUntilMillis,
     refreshStartedAtMillis = refreshStartedAtMillis,
     lastError = lastError,
-    favoriteLine = settings.favoriteLine,
+    favoriteLines = settings.favoriteLines,
     theme = settings.theme,
+    alertMinutes = settings.alertMinutes,
 )
 
 private fun StoredWidgetState.toDomain() = WidgetState(
@@ -102,5 +106,9 @@ private fun StoredWidgetState.toDomain() = WidgetState(
     liveUntilMillis = liveUntilMillis,
     refreshStartedAtMillis = refreshStartedAtMillis,
     lastError = lastError,
-    settings = WidgetSettings(favoriteLine = favoriteLine, theme = theme),
+    settings = WidgetSettings(
+        favoriteLines = favoriteLines.ifEmpty { listOfNotNull(favoriteLine) },
+        theme = theme,
+        alertMinutes = alertMinutes,
+    ),
 )

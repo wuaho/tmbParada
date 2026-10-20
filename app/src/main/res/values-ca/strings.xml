@@ -29,18 +29,14 @@
     <string name="picker_search_examples">Prova «Selva de Mar», «2903» o «V29».</string>
     <string name="picker_no_results">No s’han trobat parades</string>
     <string name="picker_current_stop">Parada actual</string>
-
-    <string name="home_intro">Consulta quan arriben els propers autobusos a la teva parada, directament a la pantalla d’inici.</string>
     <string name="home_api_title">API de TMB</string>
-    <string name="home_api_ready">Credencials configurades.</string>
     <string name="home_api_missing">Falten TMB_APP_ID i TMB_APP_KEY a local.properties. Afegeix-les i torna a compilar l’app; consulta README.md.</string>
     <string name="home_widgets_title">Els teus widgets</string>
-    <string name="home_widgets_empty">Encara no hi ha widgets a la pantalla d’inici.</string>
     <string name="home_widget_not_configured">Sense parada seleccionada</string>
     <string name="home_change_stop">Canvia la parada</string>
     <string name="home_add_widget">Afegeix el widget</string>
     <string name="home_add_widget_manually">Mantén premuda la pantalla d’inici, obre Widgets i afegeix TMB Stop.</string>
-    <string name="home_how_it_works">Els widgets no consumeixen dades en repòs. Toca ↻ en un widget per seguir les arribades en directe durant 10 minuts: s’actualitzen cada 20 segons, apareixen a la pantalla de bloqueig i reps un avís quan un autobús és a 3 minuts.</string>
+    <string name="home_how_it_works">Els widgets no consumeixen dades en repòs. Toca «Veure arribades» en un widget per seguir la teva parada en directe durant 10 minuts, amb actualitzacions cada 20 segons, també a la pantalla de bloqueig.</string>
 
     <!-- Live session notification -->
     <string name="widget_status_live_no_data">En directe</string>
@@ -57,9 +53,8 @@
     <string name="widget_then">després %1$s</string>
     <string name="preview_status">Parada 2903 · En directe · 11:33:20</string>
     <string name="settings_title">Personalitza el widget</string>
-    <string name="settings_favorite_title">Línia preferida</string>
-    <string name="settings_favorite_body">Apareix primer, en gran als widgets petits, i és l’única que t’avisa.</string>
-    <string name="settings_favorite_none">Cap</string>
+    <string name="settings_favorite_title">Línies preferides</string>
+    <string name="settings_favorite_body">Les preferides apareixen primer (la primera, en gran als widgets petits) i només elles t’avisen.</string>
     <string name="settings_theme_title">Estil</string>
     <string name="settings_theme_system">Colors del sistema</string>
     <string name="settings_theme_system_body">S’adapta al teu fons de pantalla</string>
@@ -69,4 +64,19 @@
     <string name="settings_theme_transparent_body">Deixa veure el teu fons de pantalla</string>
     <string name="settings_done">Fet</string>
     <string name="action_customize">Personalitza</string>
+
+    <!-- Home and settings (2.1) -->
+    <string name="home_subtitle">Les teves parades, en directe a la pantalla d’inici.</string>
+    <string name="home_empty_title">Encara no tens widgets</string>
+    <string name="home_empty_body">Afegeix un widget a la pantalla d’inici per saber quan arriba el teu bus.</string>
+    <string name="home_add_another">Afegeix un altre widget</string>
+    <string name="home_alert">Avís %1$s abans</string>
+    <string name="home_alert_off">Sense avís</string>
+    <string name="home_settings_title">Configuració</string>
+    <string name="home_language">Idioma</string>
+    <string name="language_system">Predeterminat del sistema</string>
+    <string name="settings_favorite_none_body">Sense preferides: veuràs totes les línies per ordre d’arribada i qualsevol et pot avisar. Toca les línies per marcar-les com a preferides.</string>
+    <string name="settings_alert_title">Avís d’arribada</string>
+    <string name="settings_alert_body">Durant una sessió en directe, avisa’m quan el meu bus sigui així de prop.</string>
+    <string name="settings_alert_off">Desactivat</string>
 </resources>

@@ -38,7 +38,7 @@ object WidgetPresenter {
 
         val snapshot = state.snapshot
         val ageMillis = snapshot?.let { (nowMillis - it.fetchedAtMillis).coerceAtLeast(0L) }
-        val rows = snapshot?.let { groupArrivals(it.arrivals, nowMillis, state.settings.favoriteLine) }.orEmpty()
+        val rows = snapshot?.let { groupArrivals(it.arrivals, nowMillis, state.settings.favoriteLines) }.orEmpty()
 
         val status = when {
             isRefreshing -> Status.Updating
@@ -67,9 +67,13 @@ object WidgetPresenter {
 
     /**
      * Groups arrivals by line and destination, ordered by the next bus of each group, with the
-     * [favoriteLine] first.
+     * [favoriteLines] first.
      */
-    fun groupArrivals(arrivals: List<Arrival>, nowMillis: Long, favoriteLine: String? = null): List<ArrivalRow> =
+    fun groupArrivals(
+        arrivals: List<Arrival>,
+        nowMillis: Long,
+        favoriteLines: Collection<String> = emptyList(),
+    ): List<ArrivalRow> =
         arrivals
             .filter { it.arrivalAtMillis >= nowMillis - DEPARTED_GRACE_MILLIS }
             .sortedBy(Arrival::arrivalAtMillis)
@@ -79,7 +83,7 @@ object WidgetPresenter {
                     line = key.first,
                     destination = key.second,
                     minutes = group.take(MAX_ARRIVALS_PER_ROW).map { minutesUntil(it.arrivalAtMillis, nowMillis) },
-                    isFavorite = key.first == favoriteLine,
+                    isFavorite = key.first in favoriteLines,
                 )
             }
             .sortedByDescending(ArrivalRow::isFavorite)

@@ -50,17 +50,17 @@ class WidgetPresenterTest {
     }
 
     @Test
-    fun `the favorite line comes first and is flagged`() {
+    fun `favorite lines come first and are flagged`() {
         val arrivals = listOf(
             Arrival("H16", "Pg. Zona Franca", now + MINUTE),
             Arrival("V29", "Diagonal Mar", now + 5 * MINUTE),
             Arrival("7", null, now + 2 * MINUTE),
         )
 
-        val rows = WidgetPresenter.groupArrivals(arrivals, now, favoriteLine = "V29")
+        val rows = WidgetPresenter.groupArrivals(arrivals, now, favoriteLines = listOf("V29", "7"))
 
-        assertEquals(listOf("V29", "H16", "7"), rows.map(ArrivalRow::line))
-        assertEquals(listOf(true, false, false), rows.map(ArrivalRow::isFavorite))
+        assertEquals(listOf("7", "V29", "H16"), rows.map(ArrivalRow::line))
+        assertEquals(listOf(true, true, false), rows.map(ArrivalRow::isFavorite))
     }
 
     @Test

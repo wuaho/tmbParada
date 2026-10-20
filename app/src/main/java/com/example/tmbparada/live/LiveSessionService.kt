@@ -39,6 +39,7 @@ class LiveSessionService : Service() {
     private var foregroundWidgetId: Int? = null
     private val shownWidgetIds = mutableSetOf<Int>()
     private val alertedRows = mutableMapOf<Int, MutableSet<String>>()
+    private val lastMinutes = mutableMapOf<Int, MutableMap<String, Int>>()
 
     private val notifications by lazy { LiveNotifications(this) }
 
@@ -111,19 +112,24 @@ class LiveSessionService : Service() {
         (shownWidgetIds - liveWidgetIds).forEach { widgetId ->
             NotificationManagerCompat.from(this).cancel(widgetId)
             alertedRows.remove(widgetId)
+            lastMinutes.remove(widgetId)
         }
         shownWidgetIds.retainAll(liveWidgetIds)
     }
 
     private fun postAlerts(widgetId: Int, state: WidgetState, nowMillis: Long) {
         val stop = state.stop ?: return
-        val favoriteLine = state.settings.favoriteLine
-        val rows = state.snapshot?.let { WidgetPresenter.groupArrivals(it.arrivals, nowMillis, favoriteLine) }.orEmpty()
+        val settings = state.settings
+        val rows = state.snapshot
+            ?.let { WidgetPresenter.groupArrivals(it.arrivals, nowMillis, settings.favoriteLines) }
+            .orEmpty()
         val alerted = alertedRows.getOrPut(widgetId) { mutableSetOf() }
-        ArrivalAlerts.due(rows, alerted, favoriteLine).forEach { row ->
+        val previous = lastMinutes.getOrPut(widgetId) { mutableMapOf() }
+        ArrivalAlerts.due(rows, previous, alerted, settings.favoriteLines, settings.alertMinutes).forEach { row ->
             alerted += ArrivalAlerts.key(row)
             post(widgetId, notifications.alert(widgetId, stop, row), tag = ArrivalAlerts.key(row))
         }
+        rows.forEach { row -> row.minutes.firstOrNull()?.let { previous[ArrivalAlerts.key(row)] = it } }
     }
 
     private fun enterForeground(widgetId: Int, notification: Notification) {

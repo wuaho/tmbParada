@@ -19,10 +19,20 @@ class WidgetStateCodecTest {
             liveUntilMillis = 600_000L,
             refreshStartedAtMillis = 20_000L,
             lastError = RefreshError.NETWORK,
-            settings = WidgetSettings(favoriteLine = "H16", theme = WidgetTheme.TRANSPARENT),
+            settings = WidgetSettings(favoriteLines = listOf("H16", "7"), theme = WidgetTheme.TRANSPARENT, alertMinutes = null),
         )
 
         assertEquals(state, WidgetStateCodec.decode(WidgetStateCodec.encode(state)))
+    }
+
+    @Test
+    fun `reads the single favorite line and default alert of version 2_0_5`() {
+        val encoded = """{"version": 2, "stop": {"code": "1"}, "favoriteLine": "V29", "theme": "TMB"}"""
+
+        assertEquals(
+            WidgetSettings(favoriteLines = listOf("V29"), theme = WidgetTheme.TMB, alertMinutes = 3),
+            WidgetStateCodec.decode(encoded).settings,
+        )
     }
 
     @Test
