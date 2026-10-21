@@ -21,9 +21,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -72,8 +74,9 @@ fun WidgetSettingsScreen(
         },
     ) { padding ->
         val initial = stored ?: return@Scaffold
-        var favoriteLine by remember(initial) { mutableStateOf(initial.favoriteLine) }
+        var favoriteLines by remember(initial) { mutableStateOf(initial.favoriteLines) }
         var theme by remember(initial) { mutableStateOf(initial.theme) }
+        var alertMinutes by remember(initial) { mutableStateOf(initial.alertMinutes) }
 
         Column(
             modifier = Modifier
@@ -90,12 +93,22 @@ fun WidgetSettingsScreen(
                 )
             }
 
-            Section(R.string.settings_favorite_title, R.string.settings_favorite_body) {
-                FavoriteLinePicker(
+            Section(
+                R.string.settings_favorite_title,
+                if (favoriteLines.isEmpty()) R.string.settings_favorite_none_body else R.string.settings_favorite_body,
+            ) {
+                FavoriteLinesPicker(
                     lines = stop?.lines.orEmpty(),
-                    selected = favoriteLine,
-                    onSelect = { favoriteLine = it },
+                    selected = favoriteLines,
+                    onToggle = { line ->
+                        // Keep the order in which lines were chosen: the first one is the big one.
+                        favoriteLines = if (line in favoriteLines) favoriteLines - line else favoriteLines + line
+                    },
                 )
+            }
+
+            Section(R.string.settings_alert_title, R.string.settings_alert_body) {
+                AlertMinutesPicker(selected = alertMinutes, onSelect = { alertMinutes = it })
             }
 
             Section(R.string.settings_theme_title, body = null) {
@@ -107,7 +120,9 @@ fun WidgetSettingsScreen(
             }
 
             Button(
-                onClick = { onDone(WidgetSettings(favoriteLine = favoriteLine, theme = theme)) },
+                onClick = {
+                    onDone(WidgetSettings(favoriteLines = favoriteLines, theme = theme, alertMinutes = alertMinutes))
+                },
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(stringResource(R.string.settings_done))
@@ -133,18 +148,37 @@ private fun Section(@StringRes title: Int, @StringRes body: Int?, content: @Comp
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun FavoriteLinePicker(lines: List<String>, selected: String?, onSelect: (String?) -> Unit) {
+private fun FavoriteLinesPicker(lines: List<String>, selected: List<String>, onToggle: (String) -> Unit) {
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        lines.forEach { line ->
+            FilterChip(
+                selected = line in selected,
+                onClick = { onToggle(line) },
+                label = { LineBadge(line) },
+                leadingIcon = if (line in selected) {
+                    { Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(FilterChipDefaults.IconSize)) }
+                } else {
+                    null
+                },
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun AlertMinutesPicker(selected: Int?, onSelect: (Int?) -> Unit) {
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         FilterChip(
             selected = selected == null,
             onClick = { onSelect(null) },
-            label = { Text(stringResource(R.string.settings_favorite_none)) },
+            label = { Text(stringResource(R.string.settings_alert_off)) },
         )
-        lines.forEach { line ->
+        WidgetSettings.ALERT_MINUTE_OPTIONS.forEach { minutes ->
             FilterChip(
-                selected = selected == line,
-                onClick = { onSelect(line) },
-                label = { LineBadge(line) },
+                selected = selected == minutes,
+                onClick = { onSelect(minutes) },
+                label = { Text(stringResource(R.string.widget_minutes, minutes)) },
             )
         }
     }

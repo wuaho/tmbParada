@@ -35,17 +35,14 @@
     <string name="picker_current_stop">Current stop</string>
 
     <!-- Home -->
-    <string name="home_intro">See when the next buses reach your stop, right on your home screen.</string>
     <string name="home_api_title">TMB API</string>
-    <string name="home_api_ready">Credentials configured.</string>
     <string name="home_api_missing">TMB_APP_ID and TMB_APP_KEY are missing from local.properties. Add them and rebuild the app; see README.md.</string>
     <string name="home_widgets_title">Your widgets</string>
-    <string name="home_widgets_empty">No widgets on your home screen yet.</string>
     <string name="home_widget_not_configured">No stop selected</string>
     <string name="home_change_stop">Change stop</string>
     <string name="home_add_widget">Add widget</string>
     <string name="home_add_widget_manually">Long-press your home screen, open Widgets, and add TMB Stop.</string>
-    <string name="home_how_it_works">Widgets do not use data while idle. Tap ↻ on a widget to follow arrivals live for 10 minutes: updates every 20 seconds, a notification on the lock screen, and an alert when a bus is 3 minutes away.</string>
+    <string name="home_how_it_works">Widgets use no data while idle. Tap “See arrivals” on a widget to follow your stop live for 10 minutes, updated every 20 seconds, on the lock screen too.</string>
 
     <!-- Live session notification -->
     <string name="widget_status_live_no_data">Live</string>
@@ -62,9 +59,8 @@
     <string name="widget_then">then %1$s</string>
     <string name="preview_status">Stop 2903 · Live · 11:33:20</string>
     <string name="settings_title">Customize widget</string>
-    <string name="settings_favorite_title">Favorite line</string>
-    <string name="settings_favorite_body">Shown first, in large type on small widgets, and the only line that alerts you.</string>
-    <string name="settings_favorite_none">None</string>
+    <string name="settings_favorite_title">Favorite lines</string>
+    <string name="settings_favorite_body">Favorites come first (the first one in large type on small widgets), and only they alert you.</string>
     <string name="settings_theme_title">Style</string>
     <string name="settings_theme_system">System colors</string>
     <string name="settings_theme_system_body">Matches your wallpaper</string>
@@ -75,4 +71,19 @@
     <string name="settings_done">Done</string>
     <string name="action_customize">Customize</string>
     <string name="widget_minutes_unit" translatable="false">min</string>
+
+    <!-- Home and settings (2.1) -->
+    <string name="home_subtitle">Your stops, live on your home screen.</string>
+    <string name="home_empty_title">No widgets yet</string>
+    <string name="home_empty_body">Add a widget to your home screen to see when your bus arrives.</string>
+    <string name="home_add_another">Add another widget</string>
+    <string name="home_alert">Alert %1$s before</string>
+    <string name="home_alert_off">No alert</string>
+    <string name="home_settings_title">Settings</string>
+    <string name="home_language">Language</string>
+    <string name="language_system">System default</string>
+    <string name="settings_favorite_none_body">No favorites: you’ll see every line in order of arrival, and any of them can alert you. Tap lines to mark them as favorites.</string>
+    <string name="settings_alert_title">Arrival alert</string>
+    <string name="settings_alert_body">During a live session, notify me when my bus gets this close.</string>
+    <string name="settings_alert_off">Off</string>
 </resources>

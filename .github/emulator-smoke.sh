@@ -79,21 +79,30 @@ tap_text "Stop 2903"
 sleep 4
 # Choosing a stop opens the widget settings; pick the transparent style to exercise it.
 shot 05b-settings
+tap_text "V29"
+tap_text "5 min"
+adb shell input swipe 540 1800 540 700 300
+sleep 1
 tap_text "Transparent"
 tap_text "Done"
 sleep 4
 # Done returns to the home screen, on the page where the launcher placed the widget.
 # Pressing Home again would jump to the launcher's default page, so the test does not.
-if ui | grep -q 'content-desc="Refresh arrivals"'; then
-  echo "Returned to the home screen showing the widget"
+# Configuring does not start a live session: the widget waits idle with its start button.
+if ui | grep -q 'text="See arrivals"'; then
+  echo "Returned to the home screen showing the idle widget"
 else
-  echo "Widget NOT visible after returning home"
+  echo "Idle widget NOT visible after returning home"
   echo "Focused window: $(adb shell dumpsys window | grep -m1 mCurrentFocus)"
+  live_failed=1
+fi
+if adb shell dumpsys activity services "$PKG" | grep -q "LiveSessionService"; then
+  echo "Live session started by configuring the widget"
   live_failed=1
 fi
 shot 06-widget
 
-tap_text "Refresh arrivals"
+tap_text "See arrivals"
 sleep 1
 shot 07-widget-refreshing
 sleep 6

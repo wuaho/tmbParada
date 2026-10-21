@@ -29,18 +29,14 @@
     <string name="picker_search_examples">Prueba «Selva de Mar», «2903» o «V29».</string>
     <string name="picker_no_results">No se han encontrado paradas</string>
     <string name="picker_current_stop">Parada actual</string>
-
-    <string name="home_intro">Consulta cuándo llegan los próximos autobuses a tu parada, directamente en la pantalla de inicio.</string>
     <string name="home_api_title">API de TMB</string>
-    <string name="home_api_ready">Credenciales configuradas.</string>
     <string name="home_api_missing">Faltan TMB_APP_ID y TMB_APP_KEY en local.properties. Añádelas y vuelve a compilar la app; consulta README.md.</string>
     <string name="home_widgets_title">Tus widgets</string>
-    <string name="home_widgets_empty">Todavía no hay widgets en tu pantalla de inicio.</string>
     <string name="home_widget_not_configured">Sin parada seleccionada</string>
     <string name="home_change_stop">Cambiar parada</string>
     <string name="home_add_widget">Añadir widget</string>
     <string name="home_add_widget_manually">Mantén pulsada la pantalla de inicio, abre Widgets y añade TMB Stop.</string>
-    <string name="home_how_it_works">Los widgets no consumen datos en reposo. Toca ↻ en un widget para seguir las llegadas en directo durante 10 minutos: se actualizan cada 20 segundos, aparecen en la pantalla de bloqueo y recibes un aviso cuando un autobús está a 3 minutos.</string>
+    <string name="home_how_it_works">Los widgets no consumen datos en reposo. Toca «Ver llegadas» en un widget para seguir tu parada en directo durante 10 minutos, con actualizaciones cada 20 segundos, también en la pantalla de bloqueo.</string>
 
     <!-- Live session notification -->
     <string name="widget_status_live_no_data">En directo</string>
@@ -57,9 +53,8 @@
     <string name="widget_then">luego %1$s</string>
     <string name="preview_status">Parada 2903 · En directo · 11:33:20</string>
     <string name="settings_title">Personalizar widget</string>
-    <string name="settings_favorite_title">Línea favorita</string>
-    <string name="settings_favorite_body">Aparece primero, en grande en los widgets pequeños, y es la única que te avisa.</string>
-    <string name="settings_favorite_none">Ninguna</string>
+    <string name="settings_favorite_title">Líneas favoritas</string>
+    <string name="settings_favorite_body">Las favoritas aparecen primero (la primera, en grande en los widgets pequeños) y solo ellas te avisan.</string>
     <string name="settings_theme_title">Estilo</string>
     <string name="settings_theme_system">Colores del sistema</string>
     <string name="settings_theme_system_body">Se adapta a tu fondo de pantalla</string>
@@ -69,4 +64,19 @@
     <string name="settings_theme_transparent_body">Deja ver tu fondo de pantalla</string>
     <string name="settings_done">Listo</string>
     <string name="action_customize">Personalizar</string>
+
+    <!-- Home and settings (2.1) -->
+    <string name="home_subtitle">Tus paradas, en directo en la pantalla de inicio.</string>
+    <string name="home_empty_title">Aún no tienes widgets</string>
+    <string name="home_empty_body">Añade un widget a tu pantalla de inicio para saber cuándo llega tu bus.</string>
+    <string name="home_add_another">Añadir otro widget</string>
+    <string name="home_alert">Aviso %1$s antes</string>
+    <string name="home_alert_off">Sin aviso</string>
+    <string name="home_settings_title">Ajustes</string>
+    <string name="home_language">Idioma</string>
+    <string name="language_system">Predeterminado del sistema</string>
+    <string name="settings_favorite_none_body">Sin favoritas: verás todas las líneas por orden de llegada y cualquiera puede avisarte. Toca las líneas para marcarlas como favoritas.</string>
+    <string name="settings_alert_title">Aviso de llegada</string>
+    <string name="settings_alert_body">Durante una sesión en directo, avísame cuando mi bus esté así de cerca.</string>
+    <string name="settings_alert_off">Desactivado</string>
 </resources>

@@ -37,7 +37,7 @@ class LiveRefreshControllerTest {
     private val stop = BusStop("2903", "Selva de Mar", listOf("7"))
 
     @Test
-    fun `configuring a widget resets its data and starts a live session`() = runTest {
+    fun `configuring a widget resets its data and leaves it idle until arrivals are requested`() = runTest {
         store.update(WIDGET) {
             WidgetState(
                 stop = BusStop("1", "Old"),
@@ -52,22 +52,27 @@ class LiveRefreshControllerTest {
         assertEquals(stop, state.stop)
         assertNull(state.snapshot)
         assertNull(state.lastError)
-        assertEquals(60_000L, state.liveUntilMillis)
-        assertEquals(listOf<Call>(Call.Now(WIDGET)), scheduler.calls)
+        assertNull(state.liveUntilMillis)
+        assertTrue(scheduler.calls.isEmpty())
         assertEquals(listOf(WIDGET), renderer.rendered)
+
+        controller.startLiveSession(WIDGET)
+
+        assertEquals(60_000L, store.get(WIDGET).liveUntilMillis)
+        assertEquals(listOf<Call>(Call.Now(WIDGET)), scheduler.calls)
     }
 
     @Test
-    fun `changing the stop keeps settings but drops a favorite line it does not serve`() {
+    fun `changing the stop keeps settings but drops favorites it does not serve`() {
         runTest {
-            val settings = WidgetSettings(favoriteLine = "7", theme = WidgetTheme.TMB)
+            val settings = WidgetSettings(favoriteLines = listOf("7", "V15"), theme = WidgetTheme.TMB, alertMinutes = 5)
             store.update(WIDGET) { WidgetState(stop = stop, settings = settings) }
 
             controller.configure(WIDGET, BusStop("1001", "Pl. Catalunya", listOf("7", "V15")))
             assertEquals(settings, store.get(WIDGET).settings)
 
-            controller.configure(WIDGET, BusStop("1002", "Hospital", listOf("H12")))
-            assertEquals(WidgetSettings(theme = WidgetTheme.TMB), store.get(WIDGET).settings)
+            controller.configure(WIDGET, BusStop("1002", "Hospital", listOf("H12", "V15")))
+            assertEquals(settings.copy(favoriteLines = listOf("V15")), store.get(WIDGET).settings)
         }
     }
 
@@ -76,9 +81,9 @@ class LiveRefreshControllerTest {
         controller.configure(WIDGET, stop)
         renderer.rendered.clear()
 
-        controller.updateSettings(WIDGET, WidgetSettings(favoriteLine = "7"))
+        controller.updateSettings(WIDGET, WidgetSettings(favoriteLines = listOf("7")))
 
-        assertEquals("7", store.get(WIDGET).settings.favoriteLine)
+        assertEquals(listOf("7"), store.get(WIDGET).settings.favoriteLines)
         assertEquals(listOf(WIDGET), renderer.rendered)
     }
 
@@ -93,7 +98,7 @@ class LiveRefreshControllerTest {
     @Test
     fun `a live session fetches every interval and then ends`() = runTest {
         arrivals.result = ArrivalsResult.Success(listOf(Arrival("7", "Zona Universitària", 120_000L)))
-        controller.configure(WIDGET, stop)
+        configureAndStart()
         scheduler.calls.clear()
 
         controller.runRefreshStep(WIDGET)
@@ -116,7 +121,7 @@ class LiveRefreshControllerTest {
     @Test
     fun `failures are stored and the session keeps retrying`() = runTest {
         arrivals.result = ArrivalsResult.Failure(RefreshError.NETWORK)
-        controller.configure(WIDGET, stop)
+        configureAndStart()
 
         controller.runRefreshStep(WIDGET)
 
@@ -129,7 +134,7 @@ class LiveRefreshControllerTest {
         val newStop = BusStop("1001", "Pl. Catalunya")
         arrivals.result = ArrivalsResult.Success(listOf(Arrival("7", null, 1L)))
         arrivals.onFetch = { store.update(WIDGET) { it.copy(stop = newStop) } }
-        controller.configure(WIDGET, stop)
+        configureAndStart()
 
         controller.runRefreshStep(WIDGET)
 
@@ -140,7 +145,7 @@ class LiveRefreshControllerTest {
     @Test
     fun `stopping a session cancels its work and keeps the last arrivals`() = runTest {
         arrivals.result = ArrivalsResult.Success(listOf(Arrival("7", null, 120_000L)))
-        controller.configure(WIDGET, stop)
+        configureAndStart()
         controller.runRefreshStep(WIDGET)
 
         controller.stopLiveSession(WIDGET)
@@ -158,6 +163,11 @@ class LiveRefreshControllerTest {
 
         assertEquals(Call.Cancel(WIDGET), scheduler.calls.last())
         assertTrue(store.states.value.isEmpty())
+    }
+
+    private suspend fun configureAndStart() {
+        controller.configure(WIDGET, stop)
+        controller.startLiveSession(WIDGET)
     }
 
     private companion object {
